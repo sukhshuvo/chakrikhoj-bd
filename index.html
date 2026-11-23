@@ -171,7 +171,7 @@ today.setHours(0,0,0,0);
 const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 // YYYY-MM-DD তারিখকে স্থানীয় সময় ধরে গণনা করা হচ্ছে, যাতে টাইমজোনে দিন ভুল না হয়।
 JOBS.forEach(j=>{
-  const [year,month,day]=j.dl.split('-').map(Number);
+  const [year,month,day]=j.dl.replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)).split('-').map(Number);
   const deadline=new Date(year,month-1,day);
   j.days=Math.round((deadline-today)/86400000);
 });
