@@ -7,155 +7,99 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@600;700;800&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
-
 <style>
-:root{--navy:#102b50;--blue:#1769aa;--blue2:#eaf4ff;--orange:#f28a32;--ink:#182b42;--muted:#65758b;--line:#e2eaf2;--paper:#f5f8fc;--white:#fff;--green:#14845b;--red:#c63d3d;--shadow:0 12px 34px rgba(16,43,80,.08);color-scheme:light}
+:root{--bg:#FFF8F1;--surface:#FFFFFF;--ink:#3B281B;--muted:#806B5A;--line:#F0DCCB;--green:#E47B2D;--on-green:#FFFFFF;--soft:#FFF0E2;--red:#C83F36;--amber:#A85A00;--red-soft:#FCE9E5;--amber-soft:#FFF2D8;--hero1:#C96525;--hero2:#F19A52;--accent:#FFD2A8;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:90px}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.75 "Noto Sans Bengali",system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.75 "Noto Sans Bengali",system-ui,sans-serif}
 h1,h2,h3{font-family:"Anek Bangla","Noto Sans Bengali",sans-serif;line-height:1.35;margin:0}
 a{color:inherit}
-:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
-.wrap{width:min(1160px,calc(100% - 36px));margin:0 auto}
-.top{background:linear-gradient(120deg,#102e56 0%,#155d99 65%,#217fbd 100%);color:#fff;overflow:hidden;position:relative}
-.top:before{content:"";position:absolute;width:500px;height:500px;border:1px solid #ffffff18;border-radius:50%;right:-180px;top:-240px;box-shadow:0 0 0 45px #ffffff08,0 0 0 95px #ffffff06}
-header{position:relative;z-index:2;background:#0d2748e8;border-bottom:1px solid #ffffff20}
-.bar{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.logo{display:flex;align-items:center;gap:11px;font:800 25px "Anek Bangla",sans-serif;text-decoration:none;color:#fff;white-space:nowrap}
-.mark{width:42px;height:42px;border-radius:13px;background:var(--orange);display:grid;place-items:center;box-shadow:0 5px 14px #0002}
-.nav{display:flex;gap:24px;align-items:center}
-.nav a{color:#eaf4ff;text-decoration:none;font-size:14px;font-weight:600}
-.nav a:hover{color:#ffc17d}
-.sync{margin:0;padding:7px 0;text-align:center;color:#d7e8f8;font-size:12px;position:relative;z-index:1}
-.hero{padding:46px 0 54px;position:relative;z-index:1}
-.hero-inner{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);align-items:center;gap:34px}
-.hero h1{font-size:clamp(30px,4.4vw,49px);font-weight:800;max-width:15ch;letter-spacing:-.02em}
-.hero p{color:#dceafa;max-width:58ch;margin:13px 0 0;font-size:16px}
-.hero-art{width:100%;max-width:360px;justify-self:center;filter:drop-shadow(0 20px 30px #001b3830)}
-.finder{display:grid;grid-template-columns:minmax(0,1fr) 190px auto;gap:9px;margin-top:25px;padding:8px;background:#fff;border-radius:15px;box-shadow:0 14px 30px #001b3830;max-width:760px}
-.finder input,.finder select{min-width:0;width:100%;height:48px;border:0;border-radius:9px;background:#f5f8fc;color:var(--ink);font:inherit;padding:0 13px}
-.finder button{border:0;border-radius:10px;background:var(--orange);color:#fff;font:700 15px "Noto Sans Bengali",sans-serif;padding:0 22px;cursor:pointer}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-.chip{border:1px solid #ffffff55;background:#ffffff12;color:#fff;font:500 14px "Noto Sans Bengali",sans-serif;padding:6px 13px;border-radius:99px;cursor:pointer}
-.chip[aria-pressed="true"]{background:#fff;border-color:#fff;color:var(--navy);font-weight:700}
-.content{padding:28px 0 54px}
-.featured{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 0 28px}
-.featured-card{background:var(--white);border:1px solid var(--line);border-radius:17px;padding:20px 22px;box-shadow:var(--shadow);min-height:132px}
-.featured-card h2{font-size:19px;color:var(--navy);margin-bottom:6px}
-.featured-card p{margin:0;color:var(--muted);font-size:14px}
-.ticker{display:flex;align-items:center;gap:10px;overflow:hidden}
-.ticker-label{flex:none;background:#fff0e4;color:#a64d0c;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700}
-#featuredJob{font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.section-title{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:22px 0 12px}
-.section-title h2{font-size:25px;color:var(--navy)}
-.section-title p{margin:0;color:var(--muted);font-size:13px}
-.notice{border:1px solid #f2d4a8;background:#fff8e9;color:#704a1d;border-radius:12px;padding:12px 15px;margin:0 0 16px;font-size:13px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:24px;align-items:start}
-.count{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 2px;border-bottom:2px solid var(--navy);font-weight:700;color:var(--navy)}
-.count span{color:var(--muted);font-weight:400;font-size:13px}
-#list{display:grid;gap:12px;margin-top:14px}
-.job{border:1px solid var(--line);background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 5px 18px #102b5008;transition:transform .18s,box-shadow .18s}
-.job:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
-.row{display:grid;grid-template-columns:82px minmax(0,1fr) auto;align-items:stretch;width:100%;border:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer;padding:0}
-.days{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;background:#eaf4ff;color:var(--blue);border-right:1px solid var(--line)}
-.days b{font:800 29px/1.1 "Anek Bangla",sans-serif}
-.days small{font-size:12px;line-height:1.3;text-align:center}
-.days.hot{background:#fff0ef;color:var(--red)}
-.days.warm{background:#fff5e8;color:#a75a00}
-.main{padding:15px 18px}
-.main h3{font-size:18px;font-weight:700;color:var(--navy)}
-.org{color:var(--muted);font-size:14px;margin-top:2px}
-.meta{display:flex;flex-wrap:wrap;gap:5px 13px;margin-top:8px;font-size:13px;color:var(--muted)}
-.tag{color:var(--blue);font-weight:700}
-.new{background:#eaf7f1;color:var(--green);border-radius:5px;padding:0 7px;font-size:11px;font-weight:700}
-.dl{padding:14px 15px;align-self:center;font-size:13px;color:var(--blue);text-align:right;font-weight:700}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.top{position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,var(--hero1),var(--hero2))}
+.top :focus-visible{outline-color:var(--accent)}
+.bar{display:flex;justify-content:center;padding:18px 0 4px;position:relative;z-index:1}
+.logo{display:flex;align-items:center;gap:10px;font:800 25px "Anek Bangla",sans-serif;text-decoration:none;color:#fff}
+.mark{width:38px;height:38px;border-radius:11px;background:var(--accent);display:grid;place-items:center}
+.sync{margin:0;font-size:14px;color:rgba(255,255,255,.75);text-align:center;position:relative;z-index:1}
+.art{position:absolute;top:14px;right:20px;width:250px;height:auto;z-index:0}
+.hero{padding:30px 0 34px;position:relative;z-index:1}
+.hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;max-width:18ch;letter-spacing:-.01em}
+.hero p{color:rgba(255,255,255,.85);max-width:56ch;margin:12px 0 0}
+.finder{display:grid;grid-template-columns:1fr 220px;gap:10px;margin-top:24px}
+.finder input,.finder select{width:100%;height:50px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;padding:0 14px}
+.finder input:focus,.finder select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font:500 15px "Noto Sans Bengali",sans-serif;padding:6px 14px;border-radius:99px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#8A431B;font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:32px;padding-bottom:56px;align-items:start}
+.count{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 0;border-bottom:2px solid var(--ink);font-weight:600}
+.count span{color:var(--muted);font-weight:400;font-size:14px}
+.job{border-bottom:1px solid var(--line);background:var(--surface)}
+.row{display:grid;grid-template-columns:84px minmax(0,1fr) auto;align-items:stretch;width:100%;border:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer;padding:0}
+.days{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;border-right:1px solid var(--line);background:var(--soft);color:var(--green)}
+.days b{font:800 30px/1.1 "Anek Bangla",sans-serif}
+.days small{font-size:13px;line-height:1.3;text-align:center}
+.days.hot{background:var(--red-soft);color:var(--red)}
+.days.warm{background:var(--amber-soft);color:var(--amber)}
+.main{padding:14px 18px}
+.main h3{font-size:18px;font-weight:700}
+.org{color:var(--muted);font-size:15px;margin-top:2px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px;color:var(--muted)}
+.tag{color:var(--green);font-weight:600}
+.new{background:var(--red);color:#fff;border-radius:4px;padding:0 7px;font-size:12px;font-weight:600}
+.dl{padding:14px 16px;align-self:center;font-size:14px;color:var(--muted);text-align:right}
 .dl svg{display:block;margin:4px 0 0 auto;transition:transform .2s}
 .row[aria-expanded="true"] .dl svg{transform:rotate(180deg)}
-.more{padding:4px 20px 20px 100px;color:#3e5065;font-size:14px}
+.more{padding:6px 18px 20px 102px;max-width:720px}
 .more[hidden]{display:none}
 .more p{margin:0 0 8px}
 .more ul{margin:0 0 16px;padding-left:20px}
-.more li{margin-bottom:5px}
-.btn{display:inline-block;background:var(--blue);color:#fff;font-weight:700;padding:9px 16px;border-radius:9px;text-decoration:none}
-.btn:hover{background:var(--navy)}
-.src{margin-left:12px;font-size:12px;color:var(--muted)}
-.empty{padding:44px 0;text-align:center;color:var(--muted)}
-aside{position:sticky;top:16px;display:grid;gap:14px}
-.box{border:1px solid var(--line);background:var(--white);border-radius:14px;padding:18px;box-shadow:0 5px 18px #102b5008}
-.box.warn{border-color:#f0c9c6;background:#fff5f4}
-.box h2{font-size:17px;margin-bottom:6px;color:var(--navy)}
-.box p{margin:0;font-size:13px;color:var(--muted)}
-.box.warn p{color:#59413f}
-.ad-slot{display:none!important}
-.extra-sections{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:28px}
-.extra-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px}
-.extra-card h3{font-size:17px;color:var(--navy);margin-bottom:5px}
-.extra-card p{font-size:13px;color:var(--muted);margin:0}
-footer{background:#102b50;color:#d5e2f0;padding:30px 0;font-size:13px}
-footer .wrap{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px}
-footer h2{font-size:16px;color:#fff;margin-bottom:5px}
+.more li{margin-bottom:6px}
+.btn{display:inline-block;background:var(--green);color:var(--on-green);font-weight:600;padding:10px 18px;border-radius:10px;text-decoration:none}
+.btn:hover{filter:brightness(1.1)}
+.src{margin-left:12px;font-size:14px;color:var(--muted)}
+.empty{padding:48px 0;text-align:center;color:var(--muted)}
+aside{position:sticky;top:16px;display:grid;gap:16px}
+.box{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:18px}
+.box.warn{border-color:var(--red);background:var(--red-soft)}
+.box h2{font-size:16px;margin-bottom:6px}
+.box p{margin:0;font-size:15px;color:var(--muted)}
+.box.warn p{color:var(--ink)}
+footer{background:var(--surface);border-top:1px solid var(--line);padding:30px 0;font-size:14px;color:var(--muted)}
+footer .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+footer h2{font-size:15px;color:var(--ink);margin-bottom:4px}
 footer p{margin:0}
-footer a{color:#ffd0a3}
-@media(max-width:900px){.layout{grid-template-columns:1fr}aside{position:static;grid-template-columns:1fr 1fr}.hero-inner{grid-template-columns:1fr .7fr}.nav{gap:13px}}
-@media(max-width:650px){.wrap{width:min(100% - 26px,1160px)}.bar{min-height:65px}.logo{font-size:21px}.nav{display:none}.hero{padding:34px 0 38px}.hero-inner{grid-template-columns:1fr}.hero-art{display:none}.hero h1{max-width:18ch}.finder{grid-template-columns:1fr;padding:7px}.finder button{height:46px}.featured{grid-template-columns:1fr}.layout{gap:18px}.row{grid-template-columns:66px minmax(0,1fr)}.dl{display:none}.main{padding:12px}.main h3{font-size:16px}.days b{font-size:25px}.more{padding:4px 14px 17px}.extra-sections{grid-template-columns:1fr}aside{grid-template-columns:1fr}footer .wrap{grid-template-columns:1fr}.section-title h2{font-size:22px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media(max-width:860px){.layout{grid-template-columns:1fr}aside{position:static}footer .wrap{grid-template-columns:1fr}.sync{display:none}}
+@media(max-width:560px){.finder{grid-template-columns:1fr}.row{grid-template-columns:68px minmax(0,1fr)}.dl{display:none}.more{padding-left:18px}.days b{font-size:26px}}
+@media(max-width:760px){.art{width:150px;right:12px;top:10px}}
+@media(max-width:560px){.art{width:90px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-
-<!-- Adsterra snippets are preserved below as inert text/plain script blocks; ads are OFF. -->
 </head>
 <body>
 <div class="top">
-<header>
-  <div class="wrap bar">
-    <a class="logo" href="#"><span class="mark"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg></span>চাকরিখোঁজ বিডি</a>
-    <nav class="nav" aria-label="প্রধান মেনু"><a href="#jobs">চাকরি খুঁজুন</a><a href="#guides">ক্যারিয়ার গাইড</a><a href="#about">আমাদের সম্পর্কে</a></nav>
-  </div>
-  <p class="sync">চাকরির তথ্য যাচাই করে নিন—আবেদনের আগে মূল প্রতিষ্ঠানের ওয়েবসাইট দেখুন</p>
-</header>
-<section class="hero"><div class="wrap hero-inner">
-  <div>
-    <h1>আপনার পরবর্তী চাকরির সুযোগ খুঁজে নিন</h1>
-    <p>সরকারি, ব্যাংক, প্রাইভেট, এনজিও ও আইটি চাকরির বিজ্ঞপ্তি এক জায়গায় খুঁজুন। পদ, প্রতিষ্ঠান ও কর্মস্থল অনুযায়ী তালিকা দেখুন।</p>
-    <div class="finder">
-      <input id="q" type="search" placeholder="পদ বা প্রতিষ্ঠানের নাম লিখুন" aria-label="চাকরি খুঁজুন">
-      <select id="loc" aria-label="কর্মস্থল"><option value="">সব জেলা</option></select>
-      <button type="button" onclick="document.getElementById('jobs').scrollIntoView({behavior:'smooth'})">চাকরি খুঁজুন</button>
-    </div>
-    <div class="chips" id="chips" role="group" aria-label="ক্যাটাগরি"></div>
-  </div>
-  <svg class="hero-art" viewBox="0 0 360 290" role="img" aria-label="চাকরি খুঁজছেন এমন একজন মানুষের ইলাস্ট্রেশন">
-    <circle cx="180" cy="145" r="132" fill="#ffffff" fill-opacity=".10"/>
-    <rect x="28" y="36" width="210" height="174" rx="18" fill="#fff"/>
-    <rect x="48" y="58" width="86" height="10" rx="5" fill="#d9e9f8"/>
-    <rect x="48" y="80" width="150" height="8" rx="4" fill="#edf3f9"/>
-    <rect x="48" y="98" width="132" height="8" rx="4" fill="#edf3f9"/>
-    <rect x="48" y="130" width="168" height="55" rx="9" fill="#eaf4ff"/>
-    <circle cx="82" cy="155" r="15" fill="#f4b77d"/>
-    <path d="M61 184c3-18 11-25 21-25s19 7 22 25" fill="#1769aa"/>
-    <rect x="116" y="145" width="82" height="7" rx="3.5" fill="#b5d2ec"/>
-    <rect x="116" y="160" width="63" height="7" rx="3.5" fill="#cfe1f2"/>
-    <circle cx="253" cy="68" r="33" fill="#f28a32"/>
-    <path d="M239 68l10 10 19-22" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M221 211c5-41 25-61 52-61s47 20 52 61" fill="#f6bd8a"/>
-    <circle cx="273" cy="119" r="30" fill="#f4b77d"/>
-    <path d="M243 117c1-25 14-39 32-39 18 0 31 14 31 36-8-8-19-12-31-12-12 0-23 5-32 15" fill="#193b60"/>
-    <path d="M245 211h61l16 48h-94z" fill="#fff"/>
-    <rect x="245" y="226" width="72" height="7" rx="3.5" fill="#d4e5f4"/>
-  </svg>
+<header><div class="wrap bar">
+<a class="logo" href="#"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A431B" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg></span>চাকরিখোঁজ বিডি</a>
+</div><p class="sync">বিজ্ঞপ্তির তথ্য ও আবেদনের শেষ তারিখ মূল প্রতিষ্ঠানের সাইটে যাচাই করুন</p></header>
+<svg class="art" viewBox="0 0 260 220" role="img" aria-label="চাকরির আবেদন, ব্রিফকেস ও সার্চের ছবি"><circle cx="130" cy="108" r="104" fill="#fff" fill-opacity=".08"/><rect x="36" y="24" width="170" height="140" rx="16" fill="#fff"/><circle cx="76" cy="68" r="20" fill="#FFC078"/><path d="M52 110c2-16 12-24 24-24s22 8 24 24z" fill="#E47B2D"/><rect x="108" y="56" width="80" height="9" rx="4.5" fill="#F3C49F"/><rect x="108" y="74" width="54" height="9" rx="4.5" fill="#FFF0E2"/><rect x="54" y="118" width="134" height="9" rx="4.5" fill="#FFF0E2"/><rect x="54" y="134" width="100" height="9" rx="4.5" fill="#FFF0E2"/><rect x="54" y="148" width="0" height="0"/><circle cx="204" cy="34" r="20" fill="#D97736"/><path d="M195 34l7 7 12-14" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="150" y="140" width="92" height="66" rx="10" fill="#FFC078"/><path d="M180 140v-8a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v8" fill="none" stroke="#FFC078" stroke-width="8"/><rect x="150" y="166" width="92" height="6" fill="#C96525"/><rect x="188" y="161" width="16" height="16" rx="3" fill="#8A431B"/><circle cx="62" cy="170" r="26" fill="#fff" fill-opacity=".14" stroke="#fff" stroke-width="7"/><path d="M82 190l22 22" stroke="#fff" stroke-width="9" stroke-linecap="round"/></svg>
+
+<section class="hero"><div class="wrap">
+<h1>কোন চাকরির সময় আগে শেষ হচ্ছে?</h1>
+<p>সরকারি, ব্যাংক, প্রাইভেট ও এনজিওর বিজ্ঞপ্তি শেষ তারিখ ধরে সাজানো। প্রতিটির সংক্ষিপ্ত তথ্য দেখে সরাসরি মূল ওয়েবসাইটে আবেদন করুন।</p>
+<div class="finder">
+<input id="q" type="search" placeholder="পদ বা প্রতিষ্ঠানের নাম লিখুন" aria-label="চাকরি খুঁজুন">
+<select id="loc" aria-label="কর্মস্থল"><option value="">সব জেলা</option></select>
+</div>
+<div class="chips" id="chips" role="group" aria-label="ক্যাটাগরি"></div>
 </div></section>
 </div>
 
-<div class="wrap content">
-  <section class="featured" aria-label="বিশেষ তথ্য">
-    <div class="featured-card"><h2>গুরুত্বপূর্ণ চাকরির বিজ্ঞপ্তি</h2><div class="ticker"><span class="ticker-label">সর্বশেষ</span><a id="featuredJob" href="#jobs">চাকরির তালিকা দেখুন</a></div><p>তালিকার চাকরির তথ্য ও সময়সীমা আবেদন করার আগে অফিসিয়াল সূত্রে যাচাই করুন।</p></div>
-    <div class="featured-card"><h2>সঠিক তথ্য, সচেতন আবেদন</h2><p>চাকরি পেতে কাউকে টাকা দেবেন না। ব্যক্তিগত তথ্য বা অর্থ দেওয়ার আগে প্রতিষ্ঠানের অফিসিয়াল ওয়েবসাইট ও নিয়োগ বিজ্ঞপ্তি মিলিয়ে নিন।</p></div>
-  </section>
-  <div class="section-title" id="jobs"><div><h2>সাম্প্রতিক চাকরির বিজ্ঞপ্তি</h2><p>ক্যাটাগরি ও জেলা বেছে আপনার পছন্দের চাকরি খুঁজুন</p></div></div>
-  <div class="notice"><strong>গুরুত্বপূর্ণ:</strong> এই ফাইলে থাকা কিছু চাকরির তথ্য ডেমো/নমুনা কনটেন্ট। এগুলোকে যাচাইকৃত বা বর্তমানে খোলা নিয়োগ হিসেবে ধরে আবেদন করবেন না। প্রকৃত বিজ্ঞপ্তি যুক্ত করার আগে প্রতিটি তথ্য, ডেডলাইন ও আবেদন লিংক যাচাই করতে হবে।</div>
 <!-- AD SLOT: চাইলে পরে Adsterra বা অন্য বিজ্ঞাপন নেটওয়ার্কের অনুমোদিত কোড এখানে বসাবেন। -->
 <div class="wrap" aria-label="বিজ্ঞাপন">
   <div class="ad-slot" style="min-height:90px;margin:18px 0;text-align:center;border:1px dashed var(--line);border-radius:10px;padding:12px;color:var(--muted)">
-    <script type="text/plain" data-ad-code="native-banner">async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/06433bac1fbb4aff731f09078d4a0101"</script>
+    <script async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/06433bac1fbb4aff731f09078d4a0101"></script>
     <div id="container-06433bac1fbb4aff731f09078d4a0101"></div>
   </div>
 </div>
@@ -167,11 +111,155 @@ footer a{color:#ffd0a3}
 <div class="empty" id="empty" hidden>কোনো বিজ্ঞপ্তি মেলেনি। অন্য শব্দ লিখুন বা ফিল্টার সরিয়ে দেখুন।</div>
 </section>
 <aside>
-<div class="box warn"><h2>আবেদনে টাকা দেবেন না</h2><p>নিয়োগের নামে ঘুষ বা জামানত চাইলে সেটি প্রতারণা। প্রতিটি বিজ্ঞপ্তির মূল সাইট খুলে তথ্য মিলিয়ে নিন। এই তালিকার প্রতিটি পদ, তারিখ ও লিংক প্রকাশের আগে যাচাই করুন।</p></div>
+
+<style>
+.job-seeker-box {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.job-seeker-box h3 {
+  color: #c2410c;
+  margin: 5px 0;
+  font-size: 19px;
+}
+.job-seeker-box p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 5px 0 12px;
+}
+.job-seeker-box svg {
+  width: 100%;
+  max-width: 190px;
+  height: auto;
+}
+.important-jobs {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: left;
+}
+.important-jobs h3 {
+  color: #c2410c;
+  font-size: 17px;
+  margin: 0 0 12px;
+}
+.important-job-item {
+  display: none;
+  padding: 12px;
+  background: #fff7ed;
+  border-radius: 9px;
+  min-height: 65px;
+}
+.important-job-item.active {
+  display: block;
+  animation: jobFade .5s ease;
+}
+.important-job-item a {
+  color: #1d4ed8;
+  font-weight: bold;
+  text-decoration: none;
+}
+.important-job-item small {
+  display: block;
+  color: #64748b;
+  margin-top: 6px;
+}
+@keyframes jobFade {
+  from {opacity:0; transform:translateY(8px)}
+  to {opacity:1; transform:translateY(0)}
+}
+</style>
+
+<div class="job-seeker-box">
+  <svg viewBox="0 0 220 190" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="110" cy="85" r="75" fill="#ffedd5"/>
+    <path d="M48 174 Q52 115 110 115 Q168 115 172 174" fill="#2563eb"/>
+    <path d="M79 67 Q78 28 113 30 Q148 32 144 75 L137 103 Q110 130 84 101Z" fill="#f4b183"/>
+    <path d="M78 69 Q69 24 111 20 Q151 20 146 67 L135 52 Q112 62 84 48Z" fill="#334155"/>
+    <circle cx="98" cy="76" r="3" fill="#1e293b"/>
+    <circle cx="126" cy="76" r="3" fill="#1e293b"/>
+    <path d="M101 94 Q112 104 124 94" stroke="#9a3412" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="142" y="104" width="48" height="36" rx="5" fill="#fff" stroke="#f97316" stroke-width="3"/>
+    <path d="M153 115 H179 M153 124 H175" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
+    <path d="M86 122 L110 146 L134 122" fill="#fff"/>
+    <path d="M110 146 L100 174 L120 174Z" fill="#f97316"/>
+  </svg>
+  <h3>আপনার স্বপ্নের চাকরি খুঁজুন</h3>
+  <p>সঠিক চাকরি, সুন্দর ভবিষ্যৎ</p>
+</div>
+
+<div class="important-jobs">
+  <h3>⭐ গুরুত্বপূর্ণ নিয়োগ আপডেট</h3>
+  <div id="importantJobSlides">
+    <div class="important-job-item active">
+      যাচাইকৃত নতুন চাকরির বিজ্ঞপ্তি শীঘ্রই এখানে দেখানো হবে।
+    </div>
+  </div>
+</div>
+
+<script>
+(async function () {
+  const box = document.getElementById("importantJobSlides");
+  try {
+    const response = await fetch("/api/jobs");
+    if (!response.ok) throw new Error("API error");
+
+    const jobs = await response.json();
+    const validJobs = jobs.filter(job =>
+      job.title &&
+      job.company &&
+      job.apply_url &&
+      !job.apply_url.includes("example.com") &&
+      /^https:\/\//i.test(job.apply_url)
+    );
+
+    if (!validJobs.length) return;
+
+    box.innerHTML = "";
+
+    validJobs.forEach((job, index) => {
+      const item = document.createElement("div");
+      item.className = "important-job-item" + (index === 0 ? " active" : "");
+
+      const link = document.createElement("a");
+      link.href = job.apply_url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = job.title;
+
+      const details = document.createElement("small");
+      details.textContent = job.company + (job.location ? " • " + job.location : "");
+
+      item.appendChild(link);
+      item.appendChild(details);
+      box.appendChild(item);
+    });
+
+    const slides = box.querySelectorAll(".important-job-item");
+    if (slides.length > 1) {
+      let current = 0;
+      setInterval(() => {
+        slides[current].classList.remove("active");
+        current = (current + 1) % slides.length;
+        slides[current].classList.add("active");
+      }, 4000);
+    }
+  } catch (error) {
+    console.log("চাকরির আপডেট লোড করা যায়নি");
+  }
+})();
+</script>
+
+  <div class="box warn"><h2>আবেদনে টাকা দেবেন না</h2><p>নিয়োগের নামে ঘুষ বা জামানত চাইলে সেটি প্রতারণা। প্রতিটি বিজ্ঞপ্তির মূল সাইট খুলে তথ্য মিলিয়ে নিন। এই তালিকার প্রতিটি পদ, তারিখ ও লিংক প্রকাশের আগে যাচাই করুন।</p></div>
 <div class="box"><h2>আমরা নিয়োগকারী নই</h2><p>এখানে আবেদন বা সিভি জমা নেওয়া হয় না। আপনি সরাসরি প্রতিষ্ঠানের অফিশিয়াল পোর্টালে যাবেন।</p></div>
 <div class="box" aria-label="বিজ্ঞাপন"><h2>বিজ্ঞাপন</h2><div class="ad-slot" style="min-height:250px;text-align:center;border:1px dashed var(--line);border-radius:8px;padding:12px;color:var(--muted)">
-<script type="text/plain" data-ad-code="at-options">
-atOptions = {
+<script>
+  atOptions = {
     'key' : 'a0336bedb98bd93ee7dafa7ba16f921d',
     'format' : 'iframe',
     'height' : 250,
@@ -179,7 +267,7 @@ atOptions = {
     'params' : {}
   };
 </script>
-<script type="text/plain" data-ad-code="banner-script">data-cfasync="false" src="https://bauval.org/22/a0336bedb98bd93ee7dafa7ba16f921d"</script>
+<script data-cfasync="false" src="https://bauval.org/22/a0336bedb98bd93ee7dafa7ba16f921d"></script>
 </div></div>
 </aside>
 </main>
@@ -187,8 +275,8 @@ atOptions = {
 
 <!-- Adsterra 320x50 banner -->
 <div class="wrap" aria-label="বিজ্ঞাপন" style="text-align:center;margin:16px auto">
-<script type="text/plain" data-ad-code="at-options">
-atOptions = {
+<script>
+  atOptions = {
     'key' : 'eab5a65d3bfdc2bf390a364e2b7fe975',
     'format' : 'iframe',
     'height' : 50,
@@ -196,13 +284,13 @@ atOptions = {
     'params' : {}
   };
 </script>
-<script type="text/plain" data-ad-code="banner-script">data-cfasync="false" src="https://bauval.org/22/eab5a65d3bfdc2bf390a364e2b7fe975"</script>
+<script data-cfasync="false" src="https://bauval.org/22/eab5a65d3bfdc2bf390a364e2b7fe975"></script>
 </div>
 
 <!-- Adsterra 728x90 banner -->
 <div class="wrap" aria-label="বিজ্ঞাপন" style="text-align:center;margin:16px auto">
-<script type="text/plain" data-ad-code="at-options">
-atOptions = {
+<script>
+  atOptions = {
     'key' : 'face125998728b46712c2fc687307704',
     'format' : 'iframe',
     'height' : 90,
@@ -210,19 +298,13 @@ atOptions = {
     'params' : {}
   };
 </script>
-<script type="text/plain" data-ad-code="banner-script">data-cfasync="false" src="https://bauval.org/22/face125998728b46712c2fc687307704"</script>
+<script data-cfasync="false" src="https://bauval.org/22/face125998728b46712c2fc687307704"></script>
 </div>
 
-<section class="extra-sections" id="guides" aria-label="সহায়ক তথ্য">
-  <article class="extra-card"><h3>ক্যারিয়ার প্রস্তুতি</h3><p>সিভি, আবেদনপত্র ও ইন্টারভিউর প্রস্তুতি নিন। প্রকাশের আগে সব নির্দেশনা প্রতিষ্ঠানের বিজ্ঞপ্তির সঙ্গে মিলিয়ে দেখুন।</p></article>
-  <article class="extra-card"><h3>নিয়োগ বিজ্ঞপ্তি যাচাই</h3><p>প্রতিষ্ঠানের নিজস্ব ওয়েবসাইট, অফিসিয়াল ইমেইল ও প্রকাশিত বিজ্ঞপ্তি থেকে তথ্য মিলিয়ে নিন।</p></article>
-  <article class="extra-card"><h3>নিরাপদে আবেদন করুন</h3><p>অপরিচিত ব্যক্তিকে টাকা, OTP বা ব্যাংক তথ্য দেবেন না। সন্দেহ হলে আবেদন স্থগিত রাখুন।</p></article>
-</section>
-</div>
-<footer id="about"><div class="wrap">
-  <div><h2>চাকরিখোঁজ বিডি</h2><p>চাকরির বিজ্ঞপ্তি খুঁজে পাওয়ার একটি সহায়ক প্ল্যাটফর্ম। আমরা কোনো নিয়োগকারী প্রতিষ্ঠান নই।</p></div>
-  <div><h2>আবেদনকারীদের জন্য</h2><p>আবেদনের আগে অফিসিয়াল বিজ্ঞপ্তি পড়ুন, যোগ্যতা ও ডেডলাইন যাচাই করুন এবং নিরাপদে আবেদন করুন।</p></div>
-  <div><h2>তথ্যের সতর্কতা</h2><p>তথ্যের নির্ভুলতা নিশ্চিত না হওয়া পর্যন্ত কোনো বিজ্ঞপ্তিকে যাচাইকৃত হিসেবে প্রকাশ করবেন না।</p></div>
+<footer><div class="wrap">
+<div><h2>দায়মুক্তি</h2><p>চাকরিখোঁজ বিডি একটি তথ্য সংকলন সাইট। আবেদনের আগে মূল সোর্সে শর্তাবলি যাচাই করুন।</p></div>
+<div><h2>কপিরাইট ও অপসারণ</h2><p>আমরা শুধু নিজস্ব ভাষায় সারসংক্ষেপ দিই। অপসারণ বা সংশোধনের অনুরোধের জন্য একটি কার্যকর যোগাযোগের ইমেইল ঠিকানা শিগগির যুক্ত করা হবে।</p></div>
+<div><h2>গোপনীয়তা</h2><p>অ্যাকাউন্ট, ফোন নম্বর বা সিভি লাগে না। আমরা ব্যবহারকারীর কোনো তথ্য সংগ্রহ করি না।</p></div>
 </div></footer>
 
 <script>
@@ -233,7 +315,7 @@ today.setHours(0,0,0,0);
 const bn=n=>String(n).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 // YYYY-MM-DD তারিখকে স্থানীয় সময় ধরে গণনা করা হচ্ছে, যাতে টাইমজোনে দিন ভুল না হয়।
 JOBS.forEach(j=>{
-  const [year,month,day]=j.dl.split('-').map(Number);
+  const [year,month,day]=j.dl.replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d)).split('-').map(Number);
   const deadline=new Date(year,month-1,day);
   j.days=Math.round((deadline-today)/86400000);
 });
@@ -269,12 +351,6 @@ $('chips').onclick=e=>{const b=e.target.closest('.chip');if(b){cat=b.dataset.c;c
 $('q').oninput=render;$('loc').onchange=render;
 $('list').onclick=e=>{const r=e.target.closest('.row');if(!r)return;const o=r.getAttribute('aria-expanded')==='true';r.setAttribute('aria-expanded',!o);document.getElementById(r.getAttribute('aria-controls')).hidden=o};
 chips();render();
-const featured=$('featuredJob');
-if(JOBS.length){
-  const featuredJob=[...JOBS].sort((a,b)=>a.days-b.days)[0];
-  featured.textContent=featuredJob.t+' — '+featuredJob.o;
-  featured.href='#jobs';
-}
 </script>
 </body>
 </html>
