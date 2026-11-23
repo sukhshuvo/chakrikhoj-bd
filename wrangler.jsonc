@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chakrikhoj-bd",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-24",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chakrikhoj-db",
+      "database_id": "08608706-4a65-475a-abf8-bea8c2bb0a52"
+    }
+  ]
+}
