@@ -39,7 +39,6 @@ h2{margin-top:0}
 </section>
 
 <div id="dashboard" hidden>
-
 <section class="panel">
 <button class="logout" id="logout">Logout</button>
 <h2>নতুন চাকরি পোস্ট</h2>
@@ -72,7 +71,6 @@ h2{margin-top:0}
 <section class="panel">
 <h2>চাকরির ওয়েবসাইট / Sources</h2>
 <p class="small">যেসব ওয়েবসাইট থেকে চাকরির বিজ্ঞপ্তি পর্যবেক্ষণ করতে চাও, সেগুলোর নাম ও লিংক এখানে যোগ করো।</p>
-
 <form id="sourceForm">
 <label>ওয়েবসাইটের নাম *</label>
 <input name="name" placeholder="যেমন: Teletalk Jobs" required>
@@ -80,7 +78,6 @@ h2{margin-top:0}
 <input name="source_url" type="url" placeholder="https://example.com" required>
 <button type="submit">Source যোগ করো</button>
 </form>
-
 <hr>
 <h3>তোমার যোগ করা Sources</h3>
 <button id="sourceRefresh" class="secondary">Refresh Sources</button>
@@ -98,7 +95,6 @@ h2{margin-top:0}
 <button id="automationRefresh">রিপোর্ট দেখুন</button>
 <div id="automationReport"></div>
 </section>
-
 </div>
 </main>
 
@@ -127,6 +123,7 @@ function showDashboard(){
   dashboard.hidden=false;
   loadPending();
   loadSources();
+  loadAutomationReport();
 }
 
 function showLogin(){
@@ -155,50 +152,43 @@ document.getElementById('loginForm').addEventListener('submit',async e=>{
 async function loadPending(){
   const box=document.getElementById('pending');
   box.textContent='লোড হচ্ছে...';
-
   try{
     const data=await api('/api/admin/pending');
     box.replaceChildren();
-
     if(!data.jobs.length){
       box.textContent='কোনো Pending চাকরি নেই।';
       return;
     }
-
     data.jobs.forEach(job=>{
       const card=document.createElement('div');
       card.className='job';
-
       const title=document.createElement('h3');
       title.textContent=job.title||'নাম নেই';
-
       const details=document.createElement('p');
       details.textContent=(job.company||'প্রতিষ্ঠান উল্লেখ নেই')+
         ' • '+(job.location||'স্থান উল্লেখ নেই');
-
       const deadline=document.createElement('p');
       deadline.textContent='শেষ তারিখ: '+(job.deadline||'উল্লেখ নেই');
-
       const flag=document.createElement('p');
       flag.textContent=job.review_flag ? 'যাচাই নোট: '+job.review_flag : '';
-
+      const apply=document.createElement('a');
+      apply.textContent='আবেদনের লিংক';
+      apply.href=job.apply_url||'#';
+      apply.target='_blank';
+      apply.rel='noopener noreferrer';
       const approve=document.createElement('button');
       approve.textContent='Approve';
       approve.addEventListener('click',()=>changeStatus(job.id,'approved'));
-
       const reject=document.createElement('button');
       reject.textContent='Reject';
       reject.className='reject';
       reject.addEventListener('click',()=>changeStatus(job.id,'rejected'));
-
-      card.append(title,details,deadline,flag,approve,reject);
+      card.append(title,details,deadline,flag,apply,approve,reject);
       box.append(card);
     });
   }catch(err){
     box.textContent=err.message;
-    if(err.message.toLowerCase().includes('unauthorized')){
-      showLogin();
-    }
+    if(err.message.toLowerCase().includes('unauthorized')) showLogin();
   }
 }
 
@@ -219,7 +209,6 @@ document.getElementById('jobForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const form=new FormData(e.target);
   const job=Object.fromEntries(form.entries());
-
   try{
     await api('/api/admin/jobs',{
       method:'POST',
@@ -233,13 +222,10 @@ document.getElementById('jobForm').addEventListener('submit',async e=>{
   }
 });
 
-// নতুন Source যোগ করা
 document.getElementById('sourceForm').addEventListener('submit',async e=>{
   e.preventDefault();
-
   const form=new FormData(e.target);
   const source=Object.fromEntries(form.entries());
-
   try{
     await api('/api/admin/sources',{
       method:'POST',
@@ -249,7 +235,6 @@ document.getElementById('sourceForm').addEventListener('submit',async e=>{
         source_url:source.source_url
       })
     });
-
     e.target.reset();
     message('নতুন Source যোগ হয়েছে');
     loadSources();
@@ -259,42 +244,32 @@ document.getElementById('sourceForm').addEventListener('submit',async e=>{
   }
 });
 
-// Source তালিকা দেখানো
 async function loadSources(){
   const box=document.getElementById('sourcesList');
   box.textContent='লোড হচ্ছে...';
-
   try{
     const data=await api('/api/admin/sources');
     box.replaceChildren();
-
     if(!data.sources.length){
       box.textContent='এখনো কোনো Source যোগ করা হয়নি।';
       return;
     }
-
     data.sources.forEach(source=>{
       const card=document.createElement('div');
       card.className='source';
-
       const name=document.createElement('h3');
       name.textContent=source.name;
-
       const link=document.createElement('p');
       link.textContent=source.source_url;
-
       const status=document.createElement('p');
       status.className='status';
       status.textContent=Number(source.enabled)===1 ? 'চালু আছে' : 'বন্ধ আছে';
-
       const check=document.createElement('p');
       check.className='small';
       check.textContent='সর্বশেষ অবস্থা: '+(source.last_status||'এখনো পরীক্ষা হয়নি');
-
       const toggle=document.createElement('button');
       toggle.textContent=Number(source.enabled)===1 ? 'বন্ধ করো' : 'চালু করো';
       toggle.className=Number(source.enabled)===1 ? 'secondary' : '';
-
       toggle.addEventListener('click',async()=>{
         try{
           await api('/api/admin/sources',{
@@ -311,7 +286,6 @@ async function loadSources(){
           message(err.message);
         }
       });
-
       card.append(name,link,status,check,toggle);
       box.append(card);
     });
@@ -323,43 +297,43 @@ async function loadSources(){
 async function loadAutomationReport(){
   const box=document.getElementById('automationReport');
   box.textContent='লোড হচ্ছে...';
-
   try{
     const data=await api('/api/admin/automation');
     box.replaceChildren();
-
     const summary=document.createElement('p');
     summary.textContent='সর্বশেষ রান: '+(
       data.latestRun ? data.latestRun.status : 'এখনো কোনো রান হয়নি'
     );
     box.append(summary);
-
+    if(data.latestRun){
+      const stats=document.createElement('p');
+      stats.textContent='পরীক্ষিত উৎস: '+(data.latestRun.sources_checked||0)+
+        ' | পাওয়া চাকরি: '+(data.latestRun.jobs_found||0)+
+        ' | নতুন যোগ: '+(data.latestRun.jobs_added||0)+
+        ' | Error: '+(data.latestRun.error_count||0);
+      box.append(stats);
+    }
     const sources=document.createElement('h3');
     sources.textContent='উৎসের অবস্থা';
     box.append(sources);
-
     if(!data.sources.length){
       const empty=document.createElement('p');
       empty.textContent='এখনো কোনো উৎস যোগ করা হয়নি।';
       box.append(empty);
     }
-
     data.sources.forEach(source=>{
       const p=document.createElement('p');
-      p.textContent=source.name+' — '+source.last_status;
+      p.textContent=source.name+' — '+(source.last_status||'পরীক্ষা হয়নি');
       box.append(p);
     });
-
     const errors=document.createElement('h3');
     errors.textContent='সাম্প্রতিক ভুল';
     box.append(errors);
-
     if(!data.errors.length){
       const noError=document.createElement('p');
       noError.textContent='কোনো Error পাওয়া যায়নি।';
       box.append(noError);
     }
-
     data.errors.forEach(item=>{
       const p=document.createElement('p');
       p.textContent=item.error_message;
@@ -398,9 +372,7 @@ const encoder = new TextEncoder();
 
 function toBase64Url(bytes) {
   let binary = '';
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
+  for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary)
     .replace(/=/g, '')
     .replace(/\+/g, '-')
@@ -416,23 +388,13 @@ function fromBase64Url(value) {
 
 async function signSession(payload, password) {
   const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(password),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
+    'raw', encoder.encode(password),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
-
-  const data = toBase64Url(
-    encoder.encode(JSON.stringify(payload))
-  );
-
+  const data = toBase64Url(encoder.encode(JSON.stringify(payload)));
   const signature = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    encoder.encode(data)
+    'HMAC', key, encoder.encode(data)
   );
-
   return data + '.' + toBase64Url(new Uint8Array(signature));
 }
 
@@ -440,33 +402,20 @@ async function verifySession(request, password) {
   try {
     const cookie = request.headers.get('Cookie') || '';
     const match = cookie.match(/(?:^|;\s*)ck_admin=([^;]+)/);
-
     if (!match) return false;
-
     const parts = match[1].split('.');
     if (parts.length !== 2) return false;
-
     const key = await crypto.subtle.importKey(
-      'raw',
-      encoder.encode(password),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
+      'raw', encoder.encode(password),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
     );
-
     const valid = await crypto.subtle.verify(
-      'HMAC',
-      key,
-      fromBase64Url(parts[1]),
-      encoder.encode(parts[0])
+      'HMAC', key, fromBase64Url(parts[1]), encoder.encode(parts[0])
     );
-
     if (!valid) return false;
-
     const payload = JSON.parse(
       new TextDecoder().decode(fromBase64Url(parts[0]))
     );
-
     return payload.exp > Math.floor(Date.now() / 1000);
   } catch {
     return false;
@@ -477,65 +426,164 @@ function json(data, status = 200, headers = {}) {
   return Response.json(data, { status, headers });
 }
 
-// বর্তমানে সক্রিয় Sources-এর সংযোগ পরীক্ষা
+// Teletalk API থেকে চাকরি সংগ্রহ; সব নতুন চাকরি Pending থাকবে
 async function collectJobs(env) {
   let runId = null;
   let sourcesChecked = 0;
   let errorCount = 0;
+  let jobsFound = 0;
+  let jobsAdded = 0;
 
   try {
     const run = await env.DB.prepare(
       "INSERT INTO collection_runs (status) VALUES ('running')"
     ).run();
-
     runId = run.meta.last_row_id;
 
+    const keywords = ['সরকারি', 'নিয়োগ', 'government'];
+    const seen = new Set();
+
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Dhaka',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(new Date());
+
+    for (const keyword of keywords) {
+      try {
+        const apiUrl = new URL(
+          'https://alljobs.teletalk.com.bd/api/v1/published-jobs/search'
+        );
+        apiUrl.searchParams.set('searchKeyword', keyword);
+
+        const response = await fetch(apiUrl.toString(), {
+          headers: { 'Accept': 'application/json' }
+        });
+        sourcesChecked++;
+
+        if (!response.ok) {
+          throw new Error('Teletalk HTTP ' + response.status);
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data.govtJobs)) {
+          throw new Error('Teletalk API response format invalid');
+        }
+
+        for (const job of data.govtJobs) {
+          const externalId = String(job.job_primary_id || '').trim();
+          const title = String(job.job_title_bn || job.job_title || '').trim();
+          const company = String(job.org_name_bn || job.org_name || '').trim();
+
+          if (!externalId || !title || seen.has(externalId)) continue;
+          seen.add(externalId);
+          jobsFound++;
+
+          const rawDeadline = String(job.deadline_date || '').trim();
+          let deadline = null;
+
+          if (/^\d{4}-\d{2}-\d{2}/.test(rawDeadline)) {
+            deadline = rawDeadline.slice(0, 10);
+          } else if (rawDeadline) {
+            const parsed = new Date(rawDeadline);
+            if (!Number.isNaN(parsed.getTime())) {
+              deadline = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Dhaka',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+              }).format(parsed);
+            }
+          }
+
+          if (deadline && deadline < today) continue;
+
+          let applyUrl = null;
+          try {
+            const candidate = new URL(String(job.application_site_url || ''));
+            if (['https:', 'http:'].includes(candidate.protocol)) {
+              applyUrl = candidate.href;
+            }
+          } catch {}
+
+          const reviewNotes = [];
+          if (!deadline) reviewNotes.push('শেষ তারিখ যাচাই প্রয়োজন');
+          if (!applyUrl) reviewNotes.push('আবেদন লিংক যাচাই প্রয়োজন');
+
+          const description = [
+            job.job_title ? 'পদের নাম: ' + job.job_title : '',
+            job.vacancy ? 'পদসংখ্যা: ' + job.vacancy : '',
+            rawDeadline ? 'মূল শেষ তারিখ: ' + rawDeadline : ''
+          ].filter(Boolean).join('\n');
+
+          const digest = await crypto.subtle.digest(
+            'SHA-256',
+            new TextEncoder().encode('teletalk:' + externalId)
+          );
+          const sourceHash = Array.from(new Uint8Array(digest))
+            .map(b => b.toString(16).padStart(2, '0')).join('');
+
+          const result = await env.DB.prepare(
+            `INSERT OR IGNORE INTO jobs
+            (title, company, category, description, deadline,
+             apply_url, source_url, status, source_hash,
+             review_flag, collected_at)
+            VALUES (?, ?, 'সরকারি', ?, ?, ?, ?, 'pending', ?, ?, CURRENT_TIMESTAMP)`
+          ).bind(
+            title,
+            company || 'উল্লেখ নেই',
+            description || title,
+            deadline,
+            applyUrl,
+            'https://alljobs.teletalk.com.bd/',
+            sourceHash,
+            reviewNotes.join(' | ') || null
+          ).run();
+
+          jobsAdded += result.meta.changes || 0;
+        }
+      } catch (error) {
+        errorCount++;
+      }
+    }
+
+    // আগে থেকে যোগ করা চালু Sources-এর সংযোগ পরীক্ষা
     const { results: sources } = await env.DB.prepare(
-      "SELECT * FROM automation_sources WHERE enabled = 1"
+      'SELECT * FROM automation_sources WHERE enabled = 1'
     ).all();
 
     for (const source of sources) {
       try {
         const response = await fetch(source.source_url, {
-          headers: {
-            "User-Agent": "ChakriKhojBD-JobMonitor/1.0"
-          },
-          redirect: "follow"
+          headers: { 'User-Agent': 'ChakriKhojBD-JobMonitor/1.0' },
+          redirect: 'follow'
         });
-
         sourcesChecked++;
 
         await env.DB.prepare(
           `UPDATE automation_sources
-           SET last_checked_at = CURRENT_TIMESTAMP,
-               last_status = ?
+           SET last_checked_at = CURRENT_TIMESTAMP, last_status = ?
            WHERE id = ?`
         ).bind(
-          response.ok ? "reachable" : "http_error_" + response.status,
+          response.ok ? 'reachable' : 'http_error_' + response.status,
           source.id
         ).run();
 
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
-
+        if (!response.ok) throw new Error('HTTP ' + response.status);
       } catch (error) {
         errorCount++;
-
         await env.DB.prepare(
           `INSERT INTO automation_errors
            (source_id, run_id, error_message)
            VALUES (?, ?, ?)`
         ).bind(
-          source.id,
-          runId,
-          String(error.message || error)
+          source.id, runId, String(error.message || error)
         ).run();
 
         await env.DB.prepare(
           `UPDATE automation_sources
-           SET last_checked_at = CURRENT_TIMESTAMP,
-               last_status = 'error'
+           SET last_checked_at = CURRENT_TIMESTAMP, last_status = 'error'
            WHERE id = ?`
         ).bind(source.id).run();
       }
@@ -546,13 +594,13 @@ async function collectJobs(env) {
        SET finished_at = CURRENT_TIMESTAMP,
            status = ?,
            sources_checked = ?,
+           jobs_found = ?,
+           jobs_added = ?,
            error_count = ?
        WHERE id = ?`
     ).bind(
-      errorCount ? "completed_with_errors" : "completed",
-      sourcesChecked,
-      errorCount,
-      runId
+      errorCount ? 'completed_with_errors' : 'completed',
+      sourcesChecked, jobsFound, jobsAdded, errorCount, runId
     ).run();
 
   } catch (error) {
@@ -565,7 +613,6 @@ async function collectJobs(env) {
          WHERE id = ?`
       ).bind(runId).run();
     }
-
     throw error;
   }
 }
@@ -588,78 +635,55 @@ export default {
       const { results } = await env.DB.prepare(
         "SELECT * FROM jobs WHERE status = 'approved' ORDER BY created_at DESC"
       ).all();
-
       return json(results);
     }
 
     if (url.pathname === '/api/admin/login' && method === 'POST') {
       if (!env.ADMIN_USERNAME || !env.ADMIN_PASSWORD) {
-        return json({
-          error: 'Admin credentials are not configured'
-        }, 500);
+        return json({ error: 'Admin credentials are not configured' }, 500);
       }
-
       const body = await request.json().catch(() => null);
-
-      if (
-        !body ||
-        body.username !== env.ADMIN_USERNAME ||
-        body.password !== env.ADMIN_PASSWORD
-      ) {
-        return json({
-          error: 'ভুল Username অথবা Password'
-        }, 401);
+      if (!body || body.username !== env.ADMIN_USERNAME ||
+          body.password !== env.ADMIN_PASSWORD) {
+        return json({ error: 'ভুল Username অথবা Password' }, 401);
       }
-
       const token = await signSession({
         exp: Math.floor(Date.now() / 1000) + 8 * 60 * 60
       }, env.ADMIN_PASSWORD);
-
       return json({ success: true }, 200, {
-        'Set-Cookie':
-          'ck_admin=' + token +
+        'Set-Cookie': 'ck_admin=' + token +
           '; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800'
       });
     }
 
     if (url.pathname === '/api/admin/logout' && method === 'POST') {
       return json({ success: true }, 200, {
-        'Set-Cookie':
-          'ck_admin=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'
+        'Set-Cookie': 'ck_admin=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'
       });
     }
 
     if (url.pathname.startsWith('/api/admin/')) {
-      if (
-        !env.ADMIN_PASSWORD ||
-        !(await verifySession(request, env.ADMIN_PASSWORD))
-      ) {
-        return json({
-          error: 'Unauthorized. আবার Login করো।'
-        }, 401);
+      if (!env.ADMIN_PASSWORD ||
+          !(await verifySession(request, env.ADMIN_PASSWORD))) {
+        return json({ error: 'Unauthorized. আবার Login করো।' }, 401);
       }
 
       if (url.pathname === '/api/admin/pending' && method === 'GET') {
         const { results } = await env.DB.prepare(
           "SELECT * FROM jobs WHERE status = 'pending' ORDER BY created_at DESC"
         ).all();
-
         return json({ jobs: results });
       }
 
-      // Sources তালিকা দেখা
       if (url.pathname === '/api/admin/sources' && method === 'GET') {
         const { results } = await env.DB.prepare(
-          "SELECT * FROM automation_sources ORDER BY id DESC"
+          'SELECT * FROM automation_sources ORDER BY id DESC'
         ).all();
-
         return json({ sources: results });
       }
 
-      // Sources যোগ করা এবং চালু/বন্ধ করা
       if (url.pathname === '/api/admin/sources' && method === 'POST') {
         const body = await request.json().catch(() => null);
-
         if (!body || !['add', 'toggle'].includes(body.action)) {
           return json({ error: 'Invalid source action' }, 400);
         }
@@ -667,64 +691,45 @@ export default {
         if (body.action === 'add') {
           const name = String(body.name || '').trim();
           const sourceUrl = String(body.source_url || '').trim();
-
           if (!name || !sourceUrl) {
-            return json({
-              error: 'ওয়েবসাইটের নাম ও লিংক দিতে হবে'
-            }, 400);
+            return json({ error: 'ওয়েবসাইটের নাম ও লিংক দিতে হবে' }, 400);
           }
-
           if (name.length > 150 || sourceUrl.length > 2000) {
             return json({ error: 'নাম অথবা লিংক অনেক বড়' }, 400);
           }
-
           let parsedUrl;
           try {
             parsedUrl = new URL(sourceUrl);
-            if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-              throw new Error();
-            }
+            if (!['http:', 'https:'].includes(parsedUrl.protocol)) throw new Error();
           } catch {
             return json({ error: 'সঠিক ওয়েবসাইট URL দাও' }, 400);
           }
-
           const existing = await env.DB.prepare(
-            "SELECT id FROM automation_sources WHERE source_url = ? LIMIT 1"
+            'SELECT id FROM automation_sources WHERE source_url = ? LIMIT 1'
           ).bind(parsedUrl.href).first();
-
           if (existing) {
             return json({ error: 'এই Source আগে থেকেই যোগ করা আছে' }, 409);
           }
-
           await env.DB.prepare(
             `INSERT INTO automation_sources
              (name, source_url, source_type, enabled)
              VALUES (?, ?, 'website', 1)`
           ).bind(name, parsedUrl.href).run();
-
           return json({ success: true });
         }
 
         if (body.action === 'toggle') {
           const id = Number(body.id);
           const enabled = Number(body.enabled);
-
-          if (
-            !Number.isInteger(id) ||
-            id < 1 ||
-            ![0, 1].includes(enabled)
-          ) {
+          if (!Number.isInteger(id) || id < 1 || ![0, 1].includes(enabled)) {
             return json({ error: 'Invalid source ID or status' }, 400);
           }
-
           const result = await env.DB.prepare(
-            "UPDATE automation_sources SET enabled = ? WHERE id = ?"
+            'UPDATE automation_sources SET enabled = ? WHERE id = ?'
           ).bind(enabled, id).run();
-
           if (!result.meta.changes) {
             return json({ error: 'Source পাওয়া যায়নি' }, 404);
           }
-
           return json({ success: true });
         }
       }
@@ -732,16 +737,15 @@ export default {
       if (url.pathname === '/api/admin/automation' && method === 'GET') {
         const [runs, sources, errors] = await Promise.all([
           env.DB.prepare(
-            "SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1"
+            'SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1'
           ).all(),
           env.DB.prepare(
-            "SELECT * FROM automation_sources ORDER BY id"
+            'SELECT * FROM automation_sources ORDER BY id'
           ).all(),
           env.DB.prepare(
-            "SELECT * FROM automation_errors ORDER BY id DESC LIMIT 10"
+            'SELECT * FROM automation_errors ORDER BY id DESC LIMIT 10'
           ).all()
         ]);
-
         return json({
           latestRun: runs.results[0] || null,
           sources: sources.results,
@@ -751,88 +755,53 @@ export default {
 
       if (url.pathname === '/api/admin/jobs' && method === 'POST') {
         const body = await request.json().catch(() => null);
-
-        if (
-          !body ||
-          !String(body.title || '').trim() ||
-          !String(body.apply_url || '').trim()
-        ) {
-          return json({
-            error: 'চাকরির নাম ও আবেদনের লিংক দিতে হবে'
-          }, 400);
+        if (!body || !String(body.title || '').trim() ||
+            !String(body.apply_url || '').trim()) {
+          return json({ error: 'চাকরির নাম ও আবেদনের লিংক দিতে হবে' }, 400);
         }
-
         try {
           const applyUrl = new URL(body.apply_url);
-          if (!['http:', 'https:'].includes(applyUrl.protocol)) {
-            throw new Error();
-          }
+          if (!['http:', 'https:'].includes(applyUrl.protocol)) throw new Error();
         } catch {
           return json({ error: 'সঠিক Apply URL দাও' }, 400);
         }
-
         const fields = [
-          'title',
-          'company',
-          'category',
-          'location',
-          'description',
-          'requirements',
-          'salary',
-          'deadline',
-          'apply_url',
-          'source_url'
+          'title','company','category','location','description',
+          'requirements','salary','deadline','apply_url','source_url'
         ];
-
         const values = fields.map(field => {
           const value = String(body[field] || '').trim();
           return value || null;
         });
-
         await env.DB.prepare(
           `INSERT INTO jobs
           (title, company, category, location, description, requirements,
            salary, deadline, apply_url, source_url, status)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`
         ).bind(...values).run();
-
-        return json({
-          success: true,
-          message: 'চাকরি Pending অবস্থায় জমা হয়েছে'
-        });
+        return json({ success: true, message: 'চাকরি Pending অবস্থায় জমা হয়েছে' });
       }
 
       if (url.pathname === '/api/admin/status' && method === 'POST') {
         const body = await request.json().catch(() => null);
         const id = Number(body?.id);
         const status = body?.status;
-
-        if (
-          !Number.isInteger(id) ||
-          id < 1 ||
-          !['approved', 'rejected'].includes(status)
-        ) {
-          return json({
-            error: 'Invalid job ID or status'
-          }, 400);
+        if (!Number.isInteger(id) || id < 1 ||
+            !['approved', 'rejected'].includes(status)) {
+          return json({ error: 'Invalid job ID or status' }, 400);
         }
-
         const result = await env.DB.prepare(
           "UPDATE jobs SET status = ? WHERE id = ? AND status = 'pending'"
         ).bind(status, id).run();
-
         if (!result.meta.changes) {
           return json({
             error: 'চাকরিটি পাওয়া যায়নি অথবা আগে থেকেই পরিবর্তিত হয়েছে'
           }, 404);
         }
-
         return json({ success: true });
       }
 
-      return json({
-        error: 'Admin API route not found'
-      }, 404);
+      return json({ error: 'Admin API route not found' }, 404);
     }
 
     return env.ASSETS.fetch(request);
