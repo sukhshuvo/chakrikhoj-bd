@@ -313,7 +313,107 @@ async function collectTeletalk(env, runId, stats) {
   }
 }
 
-async function collectRssSource(env, source, runId, stats) {
+
+async function collectTeletalk(env, runId, stats) {
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Dhaka',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+
+  try {
+    const u = new URL(
+      'https://alljobs.teletalk.com.bd/api/v1/published-jobs/search'
+    );
+    u.searchParams.set('searchKeyword', '');
+
+    const res = await fetchWithTimeout(u.href, {
+      headers: { Accept: 'application/json' }
+    });
+
+    stats.sourcesChecked++;
+
+    if (!res.ok) {
+      throw new Error('Teletalk HTTP ' + res.status);
+    }
+
+    const data = await res.json();
+
+    if (!Array.isArray(data.govtJobs)) {
+      throw new Error('Teletalk response format changed');
+    }
+
+    const seen = new Set();
+
+    for (const j of data.govtJobs) {
+      const id = String(j.job_primary_id || '').trim();
+      const title = cleanText(j.job_title_bn || j.job_title, 250);
+
+      if (!id || !title || seen.has(id)) continue;
+      seen.add(id);
+
+      stats.jobsFound++;
+
+      const published = parseDeadline(j.published_date || j.created_at);
+      if (published && published > today) continue;
+
+      const rawDeadline = String(j.deadline_date || '').trim();
+      const deadline = parseDeadline(rawDeadline);
+
+      if (deadline && deadline < today) continue;
+
+      const applyUrl = safeHttpUrl(j.application_site_url);
+
+      if (!applyUrl) {
+        await logError(
+          env,
+          null,
+          runId,
+          'Teletalk job ' + id + ': invalid application URL'
+        );
+        stats.errorCount++;
+        continue;
+      }
+
+      const description = [
+        j.job_title ? 'পদের নাম: ' + cleanText(j.job_title) : '',
+        j.job_type ? 'চাকরির ধরন: ' + cleanText(j.job_type) : '',
+        j.job_location ? 'কর্মস্থল: ' + cleanText(j.job_location) : '',
+        j.vacancy ? 'পদসংখ্যা: ' + cleanText(j.vacancy) : '',
+        j.salary ? 'বেতন: ' + cleanText(j.salary) : '',
+        rawDeadline ? 'আবেদনের শেষ তারিখ: ' + cleanText(rawDeadline) : ''
+      ].filter(Boolean).join('\n');
+
+      const added = await insertCollectedJob(
+        env,
+        {
+          title,
+          company: j.org_name_bn || j.org_name || 'উল্লেখ নেই',
+          description,
+          date: rawDeadline,
+          guid: 'teletalk:' + id,
+          link: applyUrl.href,
+          applyUrl: applyUrl.href
+        },
+        'teletalk',
+        'https://alljobs.teletalk.com.bd/',
+        'সরকারি'
+      );
+
+      stats.jobsAdded += added;
+    }
+  } catch (e) {
+    stats.errorCount++;
+    await logError(
+      env,
+      null,
+      runId,
+      'Teletalk: ' + String(e.message || e)
+    );
+  }
+}
+(env, source, runId, stats) {
   try {
     const sourceUrl = safeHttpUrl(source.source_url);
     if (!sourceUrl) throw new Error('Invalid or unsafe source URL');
