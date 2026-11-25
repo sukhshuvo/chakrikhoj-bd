@@ -64,13 +64,19 @@ h2{margin-top:0}
 <input name="source_url" type="url">
 <button type="submit">চাকরি জমা দিন</button>
 </form>
-<p class="small">তোমার পোস্ট করা চাকরিও প্রথমে Pending থাকবে। Approve করলে সাইটে প্রকাশ হবে।</p>
+<p class="small">সব চাকরি প্রথমে Pending থাকবে। Approve করলে সাইটে প্রকাশ হবে।</p>
 </section>
 
 <section class="panel">
 <h2>অনুমোদনের অপেক্ষায় থাকা চাকরি</h2>
 <button id="refresh">Refresh</button>
 <div id="pending"></div>
+</section>
+
+<section class="panel">
+<h2>অটোমেশন রিপোর্ট</h2>
+<button id="automationRefresh">রিপোর্ট দেখুন</button>
+<div id="automationReport"></div>
 </section>
 </div>
 </main>
@@ -146,6 +152,10 @@ async function loadPending(){
       const deadline=document.createElement('p');
       deadline.textContent='শেষ তারিখ: '+(job.deadline||'উল্লেখ নেই');
 
+      const flag=document.createElement('p');
+      flag.textContent=job.review_flag ?
+        'যাচাই নোট: '+job.review_flag : '';
+
       const approve=document.createElement('button');
       approve.textContent='Approve';
       approve.addEventListener('click',()=>changeStatus(job.id,'approved'));
@@ -155,7 +165,7 @@ async function loadPending(){
       reject.className='reject';
       reject.addEventListener('click',()=>changeStatus(job.id,'rejected'));
 
-      card.append(title,details,deadline,approve,reject);
+      card.append(title,details,deadline,flag,approve,reject);
       box.append(card);
     });
   }catch(err){
@@ -202,7 +212,57 @@ document.getElementById('jobForm').addEventListener('submit',async e=>{
   }
 });
 
+async function loadAutomationReport(){
+  const box=document.getElementById('automationReport');
+  box.textContent='লোড হচ্ছে...';
+
+  try{
+    const data=await api('/api/admin/automation');
+    box.replaceChildren();
+
+    const summary=document.createElement('p');
+    summary.textContent='সর্বশেষ রান: '+(data.latestRun ?
+      data.latestRun.status : 'এখনো কোনো রান হয়নি');
+    box.append(summary);
+
+    const sources=document.createElement('h3');
+    sources.textContent='উৎসের অবস্থা';
+    box.append(sources);
+
+    if(!data.sources.length){
+      const empty=document.createElement('p');
+      empty.textContent='এখনো কোনো উৎস যোগ করা হয়নি।';
+      box.append(empty);
+    }
+
+    data.sources.forEach(source=>{
+      const p=document.createElement('p');
+      p.textContent=source.name+' — '+source.last_status;
+      box.append(p);
+    });
+
+    const errors=document.createElement('h3');
+    errors.textContent='সাম্প্রতিক ভুল';
+    box.append(errors);
+
+    if(!data.errors.length){
+      const noError=document.createElement('p');
+      noError.textContent='কোনো Error পাওয়া যায়নি।';
+      box.append(noError);
+    }
+
+    data.errors.forEach(item=>{
+      const p=document.createElement('p');
+      p.textContent=item.error_message;
+      box.append(p);
+    });
+  }catch(err){
+    box.textContent=err.message;
+  }
+}
+
 document.getElementById('refresh').addEventListener('click',loadPending);
+document.getElementById('automationRefresh').addEventListener('click',loadAutomationReport);
 
 document.getElementById('logout').addEventListener('click',async()=>{
   try{
@@ -269,8 +329,6 @@ async function signSession(payload, password) {
 async function verifySession(request, password) {
   try {
     const cookie = request.headers.get('Cookie') || '';
-
-    // সংশোধিত Regex
     const match = cookie.match(/(?:^|;\s*)ck_admin=([^;]+)/);
 
     if (!match) return false;
@@ -307,6 +365,99 @@ async function verifySession(request, password) {
 
 function json(data, status = 200, headers = {}) {
   return Response.json(data, { status, headers });
+}
+
+// বর্তমান পর্যায়ে উৎসের সংযোগ পরীক্ষা ও Error Logging
+async function collectJobs(env) {
+  let runId = null;
+  let sourcesChecked = 0;
+  let errorCount = 0;
+
+  try {
+    const run = await env.DB.prepare(
+      "INSERT INTO collection_runs (status) VALUES ('running')"
+    ).run();
+
+    runId = run.meta.last_row_id;
+
+    const { results: sources } = await env.DB.prepare(
+      "SELECT * FROM automation_sources WHERE enabled = 1"
+    ).all();
+
+    for (const source of sources) {
+      try {
+        const response = await fetch(source.source_url, {
+          headers: {
+            "User-Agent": "ChakriKhojBD-JobMonitor/1.0"
+          },
+          redirect: "follow"
+        });
+
+        sourcesChecked++;
+
+        await env.DB.prepare(
+          `UPDATE automation_sources
+           SET last_checked_at = CURRENT_TIMESTAMP,
+               last_status = ?
+           WHERE id = ?`
+        ).bind(
+          response.ok ? "reachable" : "http_error_" + response.status,
+          source.id
+        ).run();
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+      } catch (error) {
+        errorCount++;
+
+        await env.DB.prepare(
+          `INSERT INTO automation_errors
+           (source_id, run_id, error_message)
+           VALUES (?, ?, ?)`
+        ).bind(
+          source.id,
+          runId,
+          String(error.message || error)
+        ).run();
+
+        await env.DB.prepare(
+          `UPDATE automation_sources
+           SET last_checked_at = CURRENT_TIMESTAMP,
+               last_status = 'error'
+           WHERE id = ?`
+        ).bind(source.id).run();
+      }
+    }
+
+    await env.DB.prepare(
+      `UPDATE collection_runs
+       SET finished_at = CURRENT_TIMESTAMP,
+           status = ?,
+           sources_checked = ?,
+           error_count = ?
+       WHERE id = ?`
+    ).bind(
+      errorCount ? "completed_with_errors" : "completed",
+      sourcesChecked,
+      errorCount,
+      runId
+    ).run();
+
+  } catch (error) {
+    if (runId !== null) {
+      await env.DB.prepare(
+        `UPDATE collection_runs
+         SET finished_at = CURRENT_TIMESTAMP,
+             status = 'failed',
+             error_count = error_count + 1
+         WHERE id = ?`
+      ).bind(runId).run();
+    }
+
+    throw error;
+  }
 }
 
 export default {
@@ -384,6 +535,26 @@ export default {
         ).all();
 
         return json({ jobs: results });
+      }
+
+      if (url.pathname === '/api/admin/automation' && method === 'GET') {
+        const [runs, sources, errors] = await Promise.all([
+          env.DB.prepare(
+            "SELECT * FROM collection_runs ORDER BY id DESC LIMIT 1"
+          ).all(),
+          env.DB.prepare(
+            "SELECT * FROM automation_sources ORDER BY id"
+          ).all(),
+          env.DB.prepare(
+            "SELECT * FROM automation_errors ORDER BY id DESC LIMIT 10"
+          ).all()
+        ]);
+
+        return json({
+          latestRun: runs.results[0] || null,
+          sources: sources.results,
+          errors: errors.results
+        });
       }
 
       if (url.pathname === '/api/admin/jobs' && method === 'POST') {
@@ -473,5 +644,10 @@ export default {
     }
 
     return env.ASSETS.fetch(request);
+  },
+
+  // Cloudflare Cron Handler
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(collectJobs(env));
   }
 };
