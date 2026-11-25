@@ -1,24 +1,270 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>চাকরিখোঁজ বিডি | ডেডলাইন অনুযায়ী চাকরির বিজ্ঞপ্তি</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@600;700;800&family=Noto+Sans+Bengali:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#FFF8F1;--surface:#FFFFFF;--ink:#3B281B;--muted:#806B5A;
+--line:#F0DCCB;--green:#E47B2D;--on-green:#FFFFFF;--soft:#FFF0E2;
+--red:#C83F36;--amber:#A85A00;--red-soft:#FCE9E5;
+--amber-soft:#FFF2D8;--hero1:#C96525;--hero2:#F19A52;
+--accent:#FFD2A8;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);
+padding-bottom:env(safe-area-inset-bottom,0px)
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.75 "Noto Sans Bengali",system-ui,sans-serif}
+h1,h2,h3{font-family:"Anek Bangla","Noto Sans Bengali",sans-serif;line-height:1.35;margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.top{position:relative;overflow:hidden;color:#fff;background:linear-gradient(135deg,var(--hero1),var(--hero2))}
+.top :focus-visible{outline-color:var(--accent)}
+.bar{display:flex;justify-content:center;padding:18px 0 4px;position:relative;z-index:1}
+.logo{display:flex;align-items:center;gap:10px;font:800 25px "Anek Bangla",sans-serif;text-decoration:none;color:#fff}
+.mark{width:38px;height:38px;border-radius:11px;background:var(--accent);display:grid;place-items:center}
+.sync{margin:0;font-size:14px;color:rgba(255,255,255,.75);text-align:center;position:relative;z-index:1}
+.art{position:absolute;top:14px;right:20px;width:250px;height:auto;z-index:0}
+.hero{padding:30px 0 34px;position:relative;z-index:1}
+.hero h1{font-size:clamp(28px,5vw,46px);font-weight:800;max-width:18ch;letter-spacing:-.01em}
+.hero p{color:rgba(255,255,255,.85);max-width:56ch;margin:12px 0 0}
+.finder{display:grid;grid-template-columns:1fr 220px;gap:10px;margin-top:24px}
+.finder input,.finder select{width:100%;height:50px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;padding:0 14px}
+.finder input:focus,.finder select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{border:1.5px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font:500 15px "Noto Sans Bengali",sans-serif;padding:6px 14px;border-radius:99px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#8A431B;font-weight:600}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:32px;padding-bottom:56px;align-items:start}
+.count{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 0;border-bottom:2px solid var(--ink);font-weight:600}
+.count span{color:var(--muted);font-weight:400;font-size:14px}
+.job{border-bottom:1px solid var(--line);background:var(--surface)}
+.row{display:grid;grid-template-columns:84px minmax(0,1fr) auto;align-items:stretch;width:100%;border:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer;padding:0}
+.days{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;border-right:1px solid var(--line);background:var(--soft);color:var(--green)}
+.days b{font:800 30px/1.1 "Anek Bangla",sans-serif}
+.days small{font-size:13px;line-height:1.3;text-align:center}
+.days.hot{background:var(--red-soft);color:var(--red)}
+.days.warm{background:var(--amber-soft);color:var(--amber)}
+.main{padding:14px 18px}
+.main h3{font-size:18px;font-weight:700}
+.org{color:var(--muted);font-size:15px;margin-top:2px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px;color:var(--muted)}
+.tag{color:var(--green);font-weight:600}
+.new{background:var(--red);color:#fff;border-radius:4px;padding:0 7px;font-size:12px;font-weight:600}
+.dl{padding:14px 16px;align-self:center;font-size:14px;color:var(--muted);text-align:right}
+.dl svg{display:block;margin:4px 0 0 auto;transition:transform .2s}
+.row[aria-expanded="true"] .dl svg{transform:rotate(180deg)}
+.more{padding:6px 18px 20px 102px;max-width:720px}
+.more[hidden]{display:none}
+.more p{margin:0 0 8px}
+.more ul{margin:0 0 16px;padding-left:20px}
+.more li{margin-bottom:6px}
+.btn{display:inline-block;background:var(--green);color:var(--on-green);font-weight:600;padding:10px 18px;border-radius:10px;text-decoration:none;border:0;cursor:pointer;font:inherit}
+.btn:hover{filter:brightness(1.1)}
+.src{margin-left:12px;font-size:14px;color:var(--muted)}
+.empty{padding:48px 0;text-align:center;color:var(--muted)}
+aside{position:sticky;top:16px;display:grid;gap:16px}
+.box{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:18px}
+.box.warn{border-color:var(--red);background:var(--red-soft)}
+.box h2{font-size:16px;margin-bottom:6px}
+.box p{margin:0;font-size:15px;color:var(--muted)}
+.box.warn p{color:var(--ink)}
+footer{background:var(--surface);border-top:1px solid var(--line);padding:30px 0;font-size:14px;color:var(--muted)}
+footer .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+footer h2{font-size:15px;color:var(--ink);margin-bottom:4px}
+footer p{margin:0}
+@media(max-width:860px){.layout{grid-template-columns:1fr}aside{position:static}footer .wrap{grid-template-columns:1fr}.sync{display:none}}
+@media(max-width:560px){.finder{grid-template-columns:1fr}.row{grid-template-columns:68px minmax(0,1fr)}.dl{display:none}.more{padding-left:18px}.days b{font-size:26px}}
+@media(max-width:760px){.art{width:150px;right:12px;top:10px}}
+@media(max-width:560px){.art{width:90px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<style>
+[aria-label="বিজ্ঞাপন"]{display:none!important}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+<header>
+<div class="wrap bar">
+<a class="logo" href="#">
+<span class="mark">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8A431B" stroke-width="2.8" stroke-linecap="round" aria-hidden="true">
+<circle cx="10.5" cy="10.5" r="6"/>
+<path d="M15 15l5.5 5.5"/>
+</svg>
+</span>
+চাকরিখোঁজ বিডি
+</a>
+</div>
+<p class="sync">বিজ্ঞপ্তির তথ্য ও আবেদনের শেষ তারিখ মূল প্রতিষ্ঠানের সাইটে যাচাই করুন</p>
+</header>
+
+<svg class="art" viewBox="0 0 260 220" role="img" aria-label="চাকরির আবেদন, ব্রিফকেস ও সার্চের ছবি">
+<circle cx="130" cy="108" r="104" fill="#fff" fill-opacity=".08"/>
+<rect x="36" y="24" width="170" height="140" rx="16" fill="#fff"/>
+<circle cx="76" cy="68" r="20" fill="#FFC078"/>
+<path d="M52 110c2-16 12-24 24-24s22 8 24 24z" fill="#E47B2D"/>
+<rect x="108" y="56" width="80" height="9" rx="4.5" fill="#F3C49F"/>
+<rect x="108" y="74" width="54" height="9" rx="4.5" fill="#FFF0E2"/>
+<rect x="54" y="118" width="134" height="9" rx="4.5" fill="#FFF0E2"/>
+<rect x="54" y="134" width="100" height="9" rx="4.5" fill="#FFF0E2"/>
+<circle cx="204" cy="34" r="20" fill="#D97736"/>
+<path d="M195 34l7 7 12-14" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="150" y="140" width="92" height="66" rx="10" fill="#FFC078"/>
+<path d="M180 140v-8a6 6 0 0 1 6-6h20a6 6 0 0 1 6 6v8" fill="none" stroke="#FFC078" stroke-width="8"/>
+<rect x="150" y="166" width="92" height="6" fill="#C96525"/>
+<rect x="188" y="161" width="16" height="16" rx="3" fill="#8A431B"/>
+<circle cx="62" cy="170" r="26" fill="#fff" fill-opacity=".14" stroke="#fff" stroke-width="7"/>
+<path d="M82 190l22 22" stroke="#fff" stroke-width="9" stroke-linecap="round"/>
+</svg>
+
+<section class="hero">
+<div class="wrap">
+<h1>কোন চাকরির সময় আগে শেষ হচ্ছে?</h1>
+<p>সরকারি, ব্যাংক, প্রাইভেট ও এনজিওর বিজ্ঞপ্তি শেষ তারিখ ধরে সাজানো। প্রতিটির সংক্ষিপ্ত তথ্য দেখে সরাসরি মূল ওয়েবসাইটে আবেদন করুন।</p>
+
+<div class="finder">
+<input id="q" type="search" placeholder="পদ বা প্রতিষ্ঠানের নাম লিখুন" aria-label="চাকরি খুঁজুন">
+<select id="loc" aria-label="কর্মস্থল">
+<option value="">সব জেলা</option>
+</select>
+</div>
+
+<div class="chips" id="chips" role="group" aria-label="ক্যাটাগরি"></div>
+</div>
+</section>
+</div>
+
+<!-- Ad slot: Adsterra code intentionally disabled -->
+<div class="wrap" aria-label="বিজ্ঞাপন">
+<div class="ad-slot" style="min-height:90px;margin:18px 0;text-align:center;border:1px dashed var(--line);border-radius:10px;padding:12px;color:var(--muted)">
+<script type="text/plain" data-ad-disabled="true" async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/06433bac1fbb4aff731f09078d4a0101"></script>
+<div id="container-06433bac1fbb4aff731f09078d4a0101"></div>
+</div>
+</div>
+
+<main class="wrap layout">
+<section aria-live="polite">
+<div class="count">
+<div id="count"></div>
+<span>শেষ তারিখ অনুযায়ী সাজানো</span>
+</div>
+<div id="list"></div>
+<div class="empty" id="empty" hidden>কোনো বিজ্ঞপ্তি মেলেনি। অন্য শব্দ লিখুন বা ফিল্টার সরিয়ে দেখুন।</div>
+</section>
+
+<aside>
+<div class="box warn">
+<h2>আবেদনে টাকা দেবেন না</h2>
+<p>নিয়োগের নামে ঘুষ বা জামানত চাইলে সেটি প্রতারণা। প্রতিটি বিজ্ঞপ্তির মূল সাইট খুলে তথ্য মিলিয়ে নিন। এই তালিকার প্রতিটি পদ, তারিখ ও লিংক প্রকাশের আগে যাচাই করুন।</p>
+</div>
+
+<div class="box">
+<h2>আমরা নিয়োগকারী নই</h2>
+<p>এখানে আবেদন বা সিভি জমা নেওয়া হয় না। আপনি সরাসরি প্রতিষ্ঠানের অফিশিয়াল পোর্টালে যাবেন।</p>
+</div>
+
+<div class="box" aria-label="বিজ্ঞাপন">
+<h2>বিজ্ঞাপন</h2>
+<div class="ad-slot" style="min-height:250px;text-align:center;border:1px dashed var(--line);border-radius:8px;padding:12px;color:var(--muted)">
+<script type="text/plain" data-ad-disabled="true">
+atOptions = {
+'key' : 'a0336bedb98bd93ee7dafa7ba16f921d',
+'format' : 'iframe',
+'height' : 250,
+'width' : 300,
+'params' : {}
+};
+</script>
+<script type="text/plain" data-ad-disabled="true" data-cfasync="false" src="https://bauval.org/22/a0336bedb98bd93ee7dafa7ba16f921d"></script>
+</div>
+</div>
+</aside>
+</main>
+
+<!-- Adsterra 320x50 banner: disabled -->
+<div class="wrap" aria-label="বিজ্ঞাপন" style="text-align:center;margin:16px auto">
+<script type="text/plain" data-ad-disabled="true">
+atOptions = {
+'key' : 'eab5a65d3bfdc2bf390a364e2b7fe975',
+'format' : 'iframe',
+'height' : 50,
+'width' : 320,
+'params' : {}
+};
+</script>
+<script type="text/plain" data-ad-disabled="true" data-cfasync="false" src="https://bauval.org/22/eab5a65d3bfdc2bf390a364e2b7fe975"></script>
+</div>
+
+<!-- Adsterra 728x90 banner: disabled -->
+<div class="wrap" aria-label="বিজ্ঞাপন" style="text-align:center;margin:16px auto">
+<script type="text/plain" data-ad-disabled="true">
+atOptions = {
+'key' : 'face125998728b46712c2fc687307704',
+'format' : 'iframe',
+'height' : 90,
+'width' : 728,
+'params' : {}
+};
+</script>
+<script type="text/plain" data-ad-disabled="true" data-cfasync="false" src="https://bauval.org/22/face125998728b46712c2fc687307704"></script>
+</div>
+
+<footer>
+<div class="wrap">
+<div>
+<h2>দায়মুক্তি</h2>
+<p>চাকরিখোঁজ বিডি একটি তথ্য সংকলন সাইট। আবেদনের আগে মূল সোর্সে শর্তাবলি যাচাই করুন।</p>
+</div>
+<div>
+<h2>কপিরাইট ও অপসারণ</h2>
+<p>আমরা শুধু নিজস্ব ভাষায় সারসংক্ষেপ দিই। অপসারণ বা সংশোধনের অনুরোধের জন্য একটি কার্যকর যোগাযোগের ইমেইল ঠিকানা শিগগির যুক্ত করা হবে।</p>
+</div>
+<div>
+<h2>গোপনীয়তা</h2>
+<p>অ্যাকাউন্ট, ফোন নম্বর বা সিভি লাগে না। আমরা ব্যবহারকারীর কোনো তথ্য সংগ্রহ করি না।</p>
+</div>
+</div>
+</footer>
+
+<script>
 const $ = id => document.getElementById(id);
-const bn = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+
+const bn = n => String(n).replace(/\d/g, d =>
+  '০১২৩৪৫৬৭৮৯'[d]
+);
 
 let JOBS = [];
 let cat = 'সব';
 let loading = true;
 let loadError = false;
 
-const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
-}[ch]));
+const escapeHTML = value =>
+  String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
 
 function safeURL(value) {
   try {
     const url = new URL(value);
-    return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
+    return ['https:', 'http:'].includes(url.protocol)
+      ? url.href
+      : '';
   } catch {
     return '';
   }
@@ -31,7 +277,10 @@ function parseDate(value) {
     '০১২৩৪৫৬৭৮৯'.indexOf(d)
   );
 
-  const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  const match = normalized.match(
+    /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+  );
+
   if (!match) return null;
 
   const [, y, m, d] = match.map(Number);
@@ -67,6 +316,7 @@ function formatDate(date) {
 
 function normalizeJob(job) {
   const deadline = parseDate(job.deadline);
+
   const requirements = String(job.requirements || '')
     .split(/\r?\n/)
     .map(x => x.trim())
@@ -83,19 +333,21 @@ function normalizeJob(job) {
     dl: deadline,
     days: getDays(deadline),
     apply: safeURL(job.apply_url),
-    source: safeURL(job.source_url),
-    n: false
+    source: safeURL(job.source_url)
   };
 }
 
 async function loadJobs() {
   loading = true;
   loadError = false;
+  render();
 
   try {
     const response = await fetch('/api/jobs', {
       method: 'GET',
-      headers: { 'Accept': 'application/json' },
+      headers: {
+        'Accept': 'application/json'
+      },
       cache: 'no-store'
     });
 
@@ -127,6 +379,7 @@ async function loadJobs() {
 
   loading = false;
   cat = 'সব';
+
   updateFilters();
   chips();
   render();
@@ -153,12 +406,13 @@ function chips() {
       ? JOBS.length
       : JOBS.filter(j => j.c === c).length;
 
-    return `<button class="chip"
-      aria-pressed="${c === cat}"
-      data-c="${escapeHTML(c)}">
-      ${c === 'সব' ? 'সব চাকরি' : escapeHTML(c)}
-      ${bn(count)}
-    </button>`;
+    return `
+      <button class="chip"
+        aria-pressed="${c === cat}"
+        data-c="${escapeHTML(c)}">
+        ${c === 'সব' ? 'সব চাকরি' : escapeHTML(c)}
+        ${bn(count)}
+      </button>`;
   }).join('');
 }
 
@@ -192,8 +446,12 @@ function render() {
   }
 
   if (loadError) {
-    $('list').innerHTML =
-      '<div class="empty">চাকরির তথ্য লোড করা যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন। <button class="btn" id="retryJobs">আবার চেষ্টা করুন</button></div>';
+    $('list').innerHTML = `
+      <div class="empty">
+        চাকরির তথ্য লোড করা যায়নি। কিছুক্ষণ পর আবার চেষ্টা করুন।
+        <br><br>
+        <button class="btn" id="retryJobs">আবার চেষ্টা করুন</button>
+      </div>`;
     $('empty').hidden = true;
     return;
   }
@@ -201,30 +459,51 @@ function render() {
   $('list').innerHTML = filtered.map((j, i) => {
     const cls = j.days !== null && j.days <= 3
       ? 'hot'
-      : j.days !== null && j.days <= 7 ? 'warm' : '';
+      : j.days !== null && j.days <= 7
+        ? 'warm'
+        : '';
 
     const big = j.days === null
       ? '—'
-      : j.days <= 0 ? 'আজ' : bn(j.days);
+      : j.days <= 0
+        ? 'আজ'
+        : bn(j.days);
 
     const small = j.days === null
       ? 'শেষ তারিখ নেই'
-      : j.days <= 0 ? 'শেষ দিন' : 'দিন বাকি';
+      : j.days <= 0
+        ? 'শেষ দিন'
+        : 'দিন বাকি';
 
     const requirements = j.b.length
-      ? `<ul>${j.b.map(b => `<li>${escapeHTML(b)}</li>`).join('')}</ul>`
+      ? `<ul>${j.b.map(b =>
+          `<li>${escapeHTML(b)}</li>`
+        ).join('')}</ul>`
       : '';
 
     const applyButton = j.apply
-      ? `<a class="btn" href="${escapeHTML(j.apply)}"
-          target="_blank" rel="nofollow noopener noreferrer">
+      ? `<a class="btn"
+          href="${escapeHTML(j.apply)}"
+          target="_blank"
+          rel="nofollow noopener noreferrer">
           মূল সাইটে আবেদন করুন
         </a>`
       : '<p>এই চাকরির আবেদন লিংক পাওয়া যায়নি।</p>';
 
+    const sourceLink = j.source
+      ? `<span class="src">তথ্যসূত্র:
+          <a href="${escapeHTML(j.source)}"
+             target="_blank"
+             rel="noopener noreferrer">মূল বিজ্ঞপ্তি</a>
+        </span>`
+      : '';
+
     return `
       <article class="job">
-        <button class="row" aria-expanded="false" aria-controls="job-${i}">
+        <button class="row"
+          aria-expanded="false"
+          aria-controls="job-${i}">
+
           <span class="days ${cls}">
             <b>${big}</b>
             <small>${small}</small>
@@ -233,18 +512,24 @@ function render() {
           <span class="main">
             <h3>${escapeHTML(j.t)}</h3>
             <div class="org">${escapeHTML(j.o)}</div>
+
             <div class="meta">
               <span class="tag">${escapeHTML(j.c)}</span>
               <span>${escapeHTML(j.l)}</span>
               <span>শেষ তারিখ ${escapeHTML(formatDate(j.dl))}</span>
-              ${j.salary ? `<span>${escapeHTML(j.salary)}</span>` : ''}
+              ${j.salary
+                ? `<span>${escapeHTML(j.salary)}</span>`
+                : ''}
             </div>
           </span>
 
           <span class="dl">
             বিস্তারিত
-            <svg width="16" height="16" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2.5">
+            <svg width="16" height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5">
               <path d="M6 9l6 6 6-6"/>
             </svg>
           </span>
@@ -254,9 +539,7 @@ function render() {
           <p>${escapeHTML(j.s)}</p>
           ${requirements}
           ${applyButton}
-          ${j.source
-            ? `<span class="src">তথ্যসূত্র: <a href="${escapeHTML(j.source)}" target="_blank" rel="noopener noreferrer">মূল বিজ্ঞপ্তি</a></span>`
-            : ''}
+          ${sourceLink}
         </div>
       </article>`;
   }).join('');
@@ -283,7 +566,9 @@ $('list').onclick = e => {
   const row = e.target.closest('.row');
   if (!row) return;
 
-  const expanded = row.getAttribute('aria-expanded') === 'true';
+  const expanded =
+    row.getAttribute('aria-expanded') === 'true';
+
   row.setAttribute('aria-expanded', String(!expanded));
 
   const details = document.getElementById(
@@ -294,3 +579,7 @@ $('list').onclick = e => {
 };
 
 loadJobs();
+</script>
+
+</body>
+</html>
