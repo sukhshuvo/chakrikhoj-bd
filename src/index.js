@@ -617,7 +617,39 @@ async function handleApi(request, env) {
     let b;
     try { b = await request.json(); }
     catch { return json({ error: 'Invalid request' }, 400); }
+if (b.action === 'edit') {
+  const id = Number(b.id);
+  const name = cleanText(b.name, 150);
+  const source = safeHttpUrl(b.source_url);
 
+  if (!Number.isInteger(id) || id < 1 || !name || !source) {
+    return json({ error: 'সঠিক ID, নাম ও URL দিতে হবে' }, 400);
+  }
+
+  const result = await env.DB.prepare(
+    'UPDATE automation_sources SET name=?, source_url=? WHERE id=?'
+  ).bind(name, source.href, id).run();
+
+  if (!result.meta?.changes) {
+    return json({ error: 'Source পাওয়া যায়নি' }, 404);
+  }
+
+  return json({ success: true, message: 'Source আপডেট হয়েছে' });
+}
+
+if (b.action === 'delete') {
+  const id = Number(b.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return json({ error: 'Invalid source ID' }, 400);
+  }
+
+  await env.DB.prepare(
+    'DELETE FROM automation_sources WHERE id=?'
+  ).bind(id).run();
+
+  return json({ success: true, message: 'Source মুছে ফেলা হয়েছে' });
+}
     if (b.action === 'toggle') {
       const id = Number(b.id);
       if (!Number.isInteger(id) || id < 1) {
