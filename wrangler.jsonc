@@ -1,3 +1,4 @@
+
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "chakrikhoj-bd",
@@ -13,5 +14,8 @@
       "database_name": "chakrikhoj-db",
       "database_id": "08608706-4a65-475a-abf8-bea8c2bb0a52"
     }
-  ]
+  ],
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  }
 }
