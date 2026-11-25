@@ -14,11 +14,12 @@ main{max-width:850px;margin:25px auto;padding:15px}
 input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #ccd3df;border-radius:7px;font-size:15px}
 button{padding:11px 17px;border:0;border-radius:7px;background:#1265c5;color:white;font-size:15px;cursor:pointer;margin:4px}
 button.reject{background:#c0392b}
+button.secondary{background:#596579}
 button.logout{background:#555;float:right}
 h2{margin-top:0}
-.job{border:1px solid #ddd;padding:14px;border-radius:8px;margin:12px 0}
+.job,.source{border:1px solid #ddd;padding:14px;border-radius:8px;margin:12px 0;overflow-wrap:anywhere}
 .small{color:#687386;font-size:13px}
-#message{padding:10px}
+.status{font-weight:bold}
 </style>
 </head>
 <body>
@@ -38,6 +39,7 @@ h2{margin-top:0}
 </section>
 
 <div id="dashboard" hidden>
+
 <section class="panel">
 <button class="logout" id="logout">Logout</button>
 <h2>নতুন চাকরি পোস্ট</h2>
@@ -68,6 +70,24 @@ h2{margin-top:0}
 </section>
 
 <section class="panel">
+<h2>চাকরির ওয়েবসাইট / Sources</h2>
+<p class="small">যেসব ওয়েবসাইট থেকে চাকরির বিজ্ঞপ্তি পর্যবেক্ষণ করতে চাও, সেগুলোর নাম ও লিংক এখানে যোগ করো।</p>
+
+<form id="sourceForm">
+<label>ওয়েবসাইটের নাম *</label>
+<input name="name" placeholder="যেমন: Teletalk Jobs" required>
+<label>ওয়েবসাইটের লিংক *</label>
+<input name="source_url" type="url" placeholder="https://example.com" required>
+<button type="submit">Source যোগ করো</button>
+</form>
+
+<hr>
+<h3>তোমার যোগ করা Sources</h3>
+<button id="sourceRefresh" class="secondary">Refresh Sources</button>
+<div id="sourcesList">লোড হচ্ছে...</div>
+</section>
+
+<section class="panel">
 <h2>অনুমোদনের অপেক্ষায় থাকা চাকরি</h2>
 <button id="refresh">Refresh</button>
 <div id="pending"></div>
@@ -78,6 +98,7 @@ h2{margin-top:0}
 <button id="automationRefresh">রিপোর্ট দেখুন</button>
 <div id="automationReport"></div>
 </section>
+
 </div>
 </main>
 
@@ -105,6 +126,12 @@ function showDashboard(){
   login.hidden=true;
   dashboard.hidden=false;
   loadPending();
+  loadSources();
+}
+
+function showLogin(){
+  dashboard.hidden=true;
+  login.hidden=false;
 }
 
 document.getElementById('loginForm').addEventListener('submit',async e=>{
@@ -153,8 +180,7 @@ async function loadPending(){
       deadline.textContent='শেষ তারিখ: '+(job.deadline||'উল্লেখ নেই');
 
       const flag=document.createElement('p');
-      flag.textContent=job.review_flag ?
-        'যাচাই নোট: '+job.review_flag : '';
+      flag.textContent=job.review_flag ? 'যাচাই নোট: '+job.review_flag : '';
 
       const approve=document.createElement('button');
       approve.textContent='Approve';
@@ -174,11 +200,6 @@ async function loadPending(){
       showLogin();
     }
   }
-}
-
-function showLogin(){
-  dashboard.hidden=true;
-  login.hidden=false;
 }
 
 async function changeStatus(id,status){
@@ -212,6 +233,93 @@ document.getElementById('jobForm').addEventListener('submit',async e=>{
   }
 });
 
+// নতুন Source যোগ করা
+document.getElementById('sourceForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+
+  const form=new FormData(e.target);
+  const source=Object.fromEntries(form.entries());
+
+  try{
+    await api('/api/admin/sources',{
+      method:'POST',
+      body:JSON.stringify({
+        action:'add',
+        name:source.name,
+        source_url:source.source_url
+      })
+    });
+
+    e.target.reset();
+    message('নতুন Source যোগ হয়েছে');
+    loadSources();
+    loadAutomationReport();
+  }catch(err){
+    message(err.message);
+  }
+});
+
+// Source তালিকা দেখানো
+async function loadSources(){
+  const box=document.getElementById('sourcesList');
+  box.textContent='লোড হচ্ছে...';
+
+  try{
+    const data=await api('/api/admin/sources');
+    box.replaceChildren();
+
+    if(!data.sources.length){
+      box.textContent='এখনো কোনো Source যোগ করা হয়নি।';
+      return;
+    }
+
+    data.sources.forEach(source=>{
+      const card=document.createElement('div');
+      card.className='source';
+
+      const name=document.createElement('h3');
+      name.textContent=source.name;
+
+      const link=document.createElement('p');
+      link.textContent=source.source_url;
+
+      const status=document.createElement('p');
+      status.className='status';
+      status.textContent=Number(source.enabled)===1 ? 'চালু আছে' : 'বন্ধ আছে';
+
+      const check=document.createElement('p');
+      check.className='small';
+      check.textContent='সর্বশেষ অবস্থা: '+(source.last_status||'এখনো পরীক্ষা হয়নি');
+
+      const toggle=document.createElement('button');
+      toggle.textContent=Number(source.enabled)===1 ? 'বন্ধ করো' : 'চালু করো';
+      toggle.className=Number(source.enabled)===1 ? 'secondary' : '';
+
+      toggle.addEventListener('click',async()=>{
+        try{
+          await api('/api/admin/sources',{
+            method:'POST',
+            body:JSON.stringify({
+              action:'toggle',
+              id:source.id,
+              enabled:Number(source.enabled)===1 ? 0 : 1
+            })
+          });
+          message('Source-এর অবস্থা পরিবর্তন হয়েছে');
+          loadSources();
+        }catch(err){
+          message(err.message);
+        }
+      });
+
+      card.append(name,link,status,check,toggle);
+      box.append(card);
+    });
+  }catch(err){
+    box.textContent=err.message;
+  }
+}
+
 async function loadAutomationReport(){
   const box=document.getElementById('automationReport');
   box.textContent='লোড হচ্ছে...';
@@ -221,8 +329,9 @@ async function loadAutomationReport(){
     box.replaceChildren();
 
     const summary=document.createElement('p');
-    summary.textContent='সর্বশেষ রান: '+(data.latestRun ?
-      data.latestRun.status : 'এখনো কোনো রান হয়নি');
+    summary.textContent='সর্বশেষ রান: '+(
+      data.latestRun ? data.latestRun.status : 'এখনো কোনো রান হয়নি'
+    );
     box.append(summary);
 
     const sources=document.createElement('h3');
@@ -262,6 +371,7 @@ async function loadAutomationReport(){
 }
 
 document.getElementById('refresh').addEventListener('click',loadPending);
+document.getElementById('sourceRefresh').addEventListener('click',loadSources);
 document.getElementById('automationRefresh').addEventListener('click',loadAutomationReport);
 
 document.getElementById('logout').addEventListener('click',async()=>{
@@ -367,7 +477,7 @@ function json(data, status = 200, headers = {}) {
   return Response.json(data, { status, headers });
 }
 
-// বর্তমান পর্যায়ে উৎসের সংযোগ পরীক্ষা ও Error Logging
+// বর্তমানে সক্রিয় Sources-এর সংযোগ পরীক্ষা
 async function collectJobs(env) {
   let runId = null;
   let sourcesChecked = 0;
@@ -537,6 +647,88 @@ export default {
         return json({ jobs: results });
       }
 
+      // Sources তালিকা দেখা
+      if (url.pathname === '/api/admin/sources' && method === 'GET') {
+        const { results } = await env.DB.prepare(
+          "SELECT * FROM automation_sources ORDER BY id DESC"
+        ).all();
+
+        return json({ sources: results });
+      }
+
+      // Sources যোগ করা এবং চালু/বন্ধ করা
+      if (url.pathname === '/api/admin/sources' && method === 'POST') {
+        const body = await request.json().catch(() => null);
+
+        if (!body || !['add', 'toggle'].includes(body.action)) {
+          return json({ error: 'Invalid source action' }, 400);
+        }
+
+        if (body.action === 'add') {
+          const name = String(body.name || '').trim();
+          const sourceUrl = String(body.source_url || '').trim();
+
+          if (!name || !sourceUrl) {
+            return json({
+              error: 'ওয়েবসাইটের নাম ও লিংক দিতে হবে'
+            }, 400);
+          }
+
+          if (name.length > 150 || sourceUrl.length > 2000) {
+            return json({ error: 'নাম অথবা লিংক অনেক বড়' }, 400);
+          }
+
+          let parsedUrl;
+          try {
+            parsedUrl = new URL(sourceUrl);
+            if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+              throw new Error();
+            }
+          } catch {
+            return json({ error: 'সঠিক ওয়েবসাইট URL দাও' }, 400);
+          }
+
+          const existing = await env.DB.prepare(
+            "SELECT id FROM automation_sources WHERE source_url = ? LIMIT 1"
+          ).bind(parsedUrl.href).first();
+
+          if (existing) {
+            return json({ error: 'এই Source আগে থেকেই যোগ করা আছে' }, 409);
+          }
+
+          await env.DB.prepare(
+            `INSERT INTO automation_sources
+             (name, source_url, source_type, enabled)
+             VALUES (?, ?, 'website', 1)`
+          ).bind(name, parsedUrl.href).run();
+
+          return json({ success: true });
+        }
+
+        if (body.action === 'toggle') {
+          const id = Number(body.id);
+          const enabled = Number(body.enabled);
+
+          if (
+            !Number.isInteger(id) ||
+            id < 1 ||
+            ![0, 1].includes(enabled)
+          ) {
+            return json({ error: 'Invalid source ID or status' }, 400);
+          }
+
+          const result = await env.DB.prepare(
+            "UPDATE automation_sources SET enabled = ? WHERE id = ?"
+          ).bind(enabled, id).run();
+
+          if (!result.meta.changes) {
+            return json({ error: 'Source পাওয়া যায়নি' }, 404);
+          }
+
+          return json({ success: true });
+        }
+      }
+
       if (url.pathname === '/api/admin/automation' && method === 'GET') {
         const [runs, sources, errors] = await Promise.all([
           env.DB.prepare(
@@ -646,7 +838,6 @@ export default {
     return env.ASSETS.fetch(request);
   },
 
-  // Cloudflare Cron Handler
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(collectJobs(env));
   }
